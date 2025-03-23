@@ -14,3 +14,4 @@
 - Add a method called "getValidNextNotes" to Melody that returns a set of notes according to the following rules:
 - Please remove the getValidNextNotes method
 - The Melody.toList method should reverse the list. Also, the companion object apply method should take a varargs of notes and create a list, reverse it and then pass it to the Melody constructor.
+- Create an Interval class that calculates the interval between a pair of notes.
