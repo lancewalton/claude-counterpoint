@@ -18,11 +18,18 @@ case class CounterpointRules():
     
     // If both voices move in parallel motion
     if motionType == Type.Parallel then
-      // Check if both intervals are perfect fifths
+      // Get intervals and their simple form
       val lastInterval = Interval.between(lowerVoiceLastNote, upperVoiceLastNote)
       val candidateInterval = Interval.between(lowerVoiceCandidateNote, upperVoiceCandidateNote)
       
-      !(lastInterval.isPerfectFifth && candidateInterval.isPerfectFifth)
+      val (lastSimpleName, lastQuality) = lastInterval.getSimpleForm
+      val (candidateSimpleName, candidateQuality) = candidateInterval.getSimpleForm
+      
+      // Check for perfect fifths in their simple form (handles compounds)
+      !(lastSimpleName == IntervalName.Fifth &&
+        candidateSimpleName == IntervalName.Fifth && 
+        lastQuality == IntervalQuality.Perfect && 
+        candidateQuality == IntervalQuality.Perfect)
     else
       // If voices move in different directions or one of them doesn't move, 
       // it's not parallel motion, so this rule doesn't apply
