@@ -46,3 +46,4 @@
 - But now the same question for Interval. Does it handle the larger compound intervals correctly, for the purposes of the MelodicRules and CounterpointRules?
 - There is duplication of logic between Interval and IntervalOps. Wouldn't it be better for MelodicRules and CounterpointRules need to knows things about intervals to get the Interval companion object to contruct the Interval, and then ask the Interval instance the right questions?
 - Fix the bug in Interval.apply for descending intervals where it was throwing a MatchError for negative interval values. Ensure the tests properly validate the difference between Interval.apply (which is direction-sensitive) and Interval.between (which always measures from the lower note to the higher note).
+- Make the tests for Interval.apply vs Interval.between more clearly demonstrate the difference between these methods. Add documentation to clarify when to use each method.
