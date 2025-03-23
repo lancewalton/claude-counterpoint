@@ -9,3 +9,4 @@
 - The tests for Note and Notes should be moved to a file called NoteSpec
 - Rename the Notes object to Note
 - Create a class called Melody that contains a list of Notes. Provide an "add" method that prepends a note to the list.
+- Make the notes field private and provide a method called "toList" that returns the reversed list of notes.
