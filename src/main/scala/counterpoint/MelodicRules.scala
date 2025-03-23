@@ -30,7 +30,7 @@ case class MelodicRules():
     
   def isLeap(note1: Note, note2: Note): Boolean =
     val simpleInterval = getSimpleIntervalSize(note1, note2)
-    simpleInterval >= 5 && simpleInterval < 8  // Don't count octaves as leaps
+    simpleInterval >= 5  // Include octaves as leaps
   
   def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
     lastNote.isWithinOctave(candidate)

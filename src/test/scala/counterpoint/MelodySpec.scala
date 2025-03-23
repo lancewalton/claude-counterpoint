@@ -54,16 +54,20 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     emptyMelody.validNextNotes should be(Note.allNotes)
     
     val melodyWithC4 = Melody.empty.add(Note.C4)
-    melodyWithC4.validNextNotes should contain(Note.C5)
-    melodyWithC4.validNextNotes should contain(Note.C3)
+    // Since octaves are now leaps, and leaps must be preceded by a note inside the span of the leap,
+    // an octave jump would be disallowed from a single note
+    melodyWithC4.validNextNotes should not contain(Note.C5)
+    melodyWithC4.validNextNotes should not contain(Note.C3)
     
     val melodyWithG4 = Melody.empty.add(Note.G4)
-    melodyWithG4.validNextNotes should contain(Note.G5)
-    melodyWithG4.validNextNotes should contain(Note.G3)
+    // Similarly, octave leaps from G4 should also be disallowed
+    melodyWithG4.validNextNotes should not contain(Note.G5)
+    melodyWithG4.validNextNotes should not contain(Note.G3)
     
     val melodyWithHighNote = Melody.empty.add(Note.G5)
-    // G5 should have valid next notes
-    melodyWithHighNote.validNextNotes should contain(Note.G4)
+    // G5 should have valid next notes, but not an octave leap
+    melodyWithHighNote.validNextNotes should not contain(Note.G4)
+    melodyWithHighNote.validNextNotes should contain(Note.F5)  // Step down is allowed
   }
   
   it should "use melodic rules to filter valid next notes" in {

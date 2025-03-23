@@ -61,7 +61,7 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     rules.isLeap(Note.C4, Note.B4) should be(true)  // major seventh
     
     // Octaves are leaps
-    rules.isLeap(Note.C4, Note.C5) should be(false)  // octave - not a leap for our implementation
+    rules.isLeap(Note.C4, Note.C5) should be(true)  // octave is now considered a leap
     
     // Thirds are not leaps
     rules.isLeap(Note.C4, Note.E4) should be(false)  // major third
