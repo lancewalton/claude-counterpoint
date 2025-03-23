@@ -3,44 +3,35 @@ package counterpoint
 enum NoteName:
   case C, D, E, F, G, A, B
 
-enum Accidental:
-  case Natural, Sharp, Flat
-
-case class Note(name: NoteName, accidental: Accidental, octave: Int):
-  override def toString: String = 
-    val accStr = accidental match
-      case Accidental.Natural => ""
-      case Accidental.Sharp => "#"
-      case Accidental.Flat => "b"
-    s"${name}$accStr$octave"
+case class Note(name: NoteName, octave: Int):
+  override def toString: String = s"$name$octave"
 
 object Notes:
   import NoteName.*
-  import Accidental.*
   
   // C Major scale notes from G2 to G5
-  val G2 = Note(G, Natural, 2)
-  val A2 = Note(A, Natural, 2)
-  val B2 = Note(B, Natural, 2)
-  val C3 = Note(C, Natural, 3)
-  val D3 = Note(D, Natural, 3)
-  val E3 = Note(E, Natural, 3)
-  val F3 = Note(F, Natural, 3)
-  val G3 = Note(G, Natural, 3)
-  val A3 = Note(A, Natural, 3)
-  val B3 = Note(B, Natural, 3)
-  val C4 = Note(C, Natural, 4)
-  val D4 = Note(D, Natural, 4)
-  val E4 = Note(E, Natural, 4)
-  val F4 = Note(F, Natural, 4)
-  val G4 = Note(G, Natural, 4)
-  val A4 = Note(A, Natural, 4)
-  val B4 = Note(B, Natural, 4)
-  val C5 = Note(C, Natural, 5)
-  val D5 = Note(D, Natural, 5)
-  val E5 = Note(E, Natural, 5)
-  val F5 = Note(F, Natural, 5)
-  val G5 = Note(G, Natural, 5)
+  val G2 = Note(G, 2)
+  val A2 = Note(A, 2)
+  val B2 = Note(B, 2)
+  val C3 = Note(C, 3)
+  val D3 = Note(D, 3)
+  val E3 = Note(E, 3)
+  val F3 = Note(F, 3)
+  val G3 = Note(G, 3)
+  val A3 = Note(A, 3)
+  val B3 = Note(B, 3)
+  val C4 = Note(C, 4)
+  val D4 = Note(D, 4)
+  val E4 = Note(E, 4)
+  val F4 = Note(F, 4)
+  val G4 = Note(G, 4)
+  val A4 = Note(A, 4)
+  val B4 = Note(B, 4)
+  val C5 = Note(C, 5)
+  val D5 = Note(D, 5)
+  val E5 = Note(E, 5)
+  val F5 = Note(F, 5)
+  val G5 = Note(G, 5)
   
   // C Major scale
   val cMajorScale: List[Note] = List(
