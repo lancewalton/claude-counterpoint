@@ -5,15 +5,20 @@ case class Melody private (private val notes: List[Note]):
   
   def toList: List[Note] = notes.reverse
   
+  def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
+    lastNote.isWithinOctave(candidate)
+    
+  def notASeventhRule(lastNote: Note, candidate: Note): Boolean =
+    lastNote.intervalSize(candidate) != 7
+  
   def validNextNotes: List[Note] =
     if notes.isEmpty then
       Note.allNotes
     else
       val lastNote = notes.head
-      Note.allNotes.filter(note => 
-        lastNote.isWithinOctave(note) && 
-        lastNote.intervalSize(note) != 7  // disallow intervals of a seventh
-      )
+      Note.allNotes
+        .filter(note => isWithinOctaveRule(lastNote, note))
+        .filter(note => notASeventhRule(lastNote, note))
   
   override def toString: String = toList.mkString(" ")
 

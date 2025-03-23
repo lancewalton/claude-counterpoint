@@ -27,6 +27,12 @@ package counterpoint
   val melodyWithG5 = Melody.empty.add(Note.G5)
   println(s"Valid notes after G5: ${melodyWithG5.validNextNotes.mkString(", ")}")
   
-  println("\nShowing the disallowed intervals of a seventh:")
-  println(s"C4 to B4 is an interval of size: ${Note.C4.intervalSize(Note.B4)}")
-  println(s"Is B4 in valid next notes after C4? ${melodyWithC4.validNextNotes.contains(Note.B4)}")
+  println("\nShowing the application of counterpoint rules:")
+  println("1. Within octave rule:")
+  println(s"  C4 to C5 is within octave: ${melodyWithC4.isWithinOctaveRule(Note.C4, Note.C5)}")
+  println(s"  C4 to D5 is within octave: ${melodyWithC4.isWithinOctaveRule(Note.C4, Note.D5)}")
+  
+  println("2. Not a seventh rule:")
+  println(s"  C4 to B4 is a seventh interval: ${Note.C4.intervalSize(Note.B4)}")
+  println(s"  Rule passes? ${melodyWithC4.notASeventhRule(Note.C4, Note.B4)}")
+  println(s"  Is B4 in valid next notes after C4? ${melodyWithC4.validNextNotes.contains(Note.B4)}")
