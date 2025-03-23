@@ -93,9 +93,9 @@ object Interval:
   
   def between(note1: Note, note2: Note): Interval =
     if (note1.midiNumber <= note2.midiNumber)
-      note1.interval(note2)
+      apply(note1, note2)
     else
-      note2.interval(note1)
+      apply(note2, note1)
       
   def size(note1: Note, note2: Note): Int =
     if (note1.midiNumber <= note2.midiNumber)
