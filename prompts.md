@@ -32,4 +32,4 @@ Always keep the parameters to higher order functions like filter, map, flatMap e
 Instead of the getLastThreeNotes method and all of those options, use a pattern match on the notes list to handle the different cases.
 Collapse the three cases where there aren't enough notes to trigger the rule down to a default case that returns true
 The first parameter of MelodicRules.afterTwoSkipsChangeDirectionRule does not need to be an Option. Change it to just take a Note.
-The next melodic rule is that when there are two consecutive skips in the same direction, they should not span the interval of a seventh
+The next melodic rule is that when there are two consecutive skips in the same direction, they should not span the interval of a seventh. (This rule was later removed to be reimplemented correctly in the future.)
