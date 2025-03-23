@@ -28,6 +28,17 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
           candidateNote
         )
       case _ => true  // Not enough notes to trigger the rule
+      
+  private def meetsNoSeventhInSameDirectionRule(candidateNote: Note): Boolean =
+    toList match
+      case secondLast :: last :: _ =>
+        // Two or more notes, check the rule
+        rules.noSeventhInSameDirectionRule(
+          secondLast,
+          last,
+          candidateNote
+        )
+      case _ => true  // Not enough notes to trigger the rule
   
   def validNextNotes: List[Note] =
     if notes.isEmpty then
@@ -38,6 +49,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
         .filter(meetsNoSeventhRule)
         .filter(meetsNoTritoneRule)
         .filter(meetsConsecutiveSkipsRule)
+        .filter(meetsNoSeventhInSameDirectionRule)
   
   override def toString: String = toList.mkString(" ")
 

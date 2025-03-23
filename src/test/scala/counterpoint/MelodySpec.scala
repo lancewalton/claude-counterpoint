@@ -123,3 +123,35 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     melodyWithMixedSkips.validNextNotes should contain(Note.D4)  // Step up
     melodyWithMixedSkips.validNextNotes should contain(Note.B3)  // Step down
   }
+  
+  it should "enforce the no seventh in same direction rule" in {
+    // Create a melody with ascending movement
+    val melodyAscending = Melody.empty
+      .add(Note.C4)
+      .add(Note.E4)  // Third up from C4
+    
+    // An ascending movement to B4 would create a seventh from C4 to B4 - disallowed
+    melodyAscending.validNextNotes should not contain(Note.B4)  // Seventh from C4
+    
+    // An ascending movement to A4 would create a sixth from C4 to A4 - allowed
+    melodyAscending.validNextNotes should contain(Note.A4)  // Sixth from C4
+    
+    // Create a melody with descending movement
+    val melodyDescending = Melody.empty
+      .add(Note.B4)
+      .add(Note.G4)  // Third down from B4
+    
+    // A descending movement to C4 would create a seventh from B4 to C4 - disallowed
+    melodyDescending.validNextNotes should not contain(Note.C4)  // Seventh from B4
+    
+    // A descending movement to D4 would create a sixth from B4 to D4 - allowed
+    melodyDescending.validNextNotes should contain(Note.D4)  // Sixth from B4
+    
+    // Create a melody with mixed direction movement
+    val melodyMixed = Melody.empty
+      .add(Note.E4)
+      .add(Note.C4)  // Third down from E4
+    
+    // Going up to G4 is possible even though it would be a fifth from C4
+    melodyMixed.validNextNotes should contain(Note.G4)  // The rule doesn't apply since directions differ
+  }

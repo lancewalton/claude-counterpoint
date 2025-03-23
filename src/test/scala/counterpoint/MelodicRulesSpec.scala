@@ -167,3 +167,72 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     ) should be(true)  // Allowed because we don't have two consecutive skips
   }
   
+  it should "apply the no seventh in same direction rule correctly" in {
+    val rules = MelodicRules()
+    
+    // Test ascending pattern
+    val secondLastAscending = Note.C4
+    val lastAscending = Note.E4       // Third up from C4
+    
+    // C4 -> E4 -> B4 would span C4 to B4, which is a seventh - disallowed
+    rules.noSeventhInSameDirectionRule(
+      secondLastAscending,
+      lastAscending,
+      Note.B4  // Fifth up from E4, but seventh from C4
+    ) should be(false)
+    
+    // C4 -> E4 -> A4 would span C4 to A4, which is a sixth - allowed
+    rules.noSeventhInSameDirectionRule(
+      secondLastAscending,
+      lastAscending,
+      Note.A4  // Fourth up from E4, sixth from C4
+    ) should be(true)
+    
+    // C4 -> E4 -> G4 would span C4 to G4, which is a fifth - allowed
+    rules.noSeventhInSameDirectionRule(
+      secondLastAscending,
+      lastAscending,
+      Note.G4  // Third up from E4, fifth from C4
+    ) should be(true)
+    
+    // Test descending pattern
+    val secondLastDescending = Note.B4
+    val lastDescending = Note.G4       // Third down from B4
+    
+    // B4 -> G4 -> C4 would span B4 to C4, which is a seventh - disallowed
+    rules.noSeventhInSameDirectionRule(
+      secondLastDescending,
+      lastDescending,
+      Note.C4  // Fifth down from G4, seventh from B4
+    ) should be(false)
+    
+    // B4 -> G4 -> D4 would span B4 to D4, which is a sixth - allowed
+    rules.noSeventhInSameDirectionRule(
+      secondLastDescending,
+      lastDescending,
+      Note.D4  // Fourth down from G4, sixth from B4
+    ) should be(true)
+    
+    // Test with mixed directions (rule shouldn't apply)
+    val secondLastMixed = Note.C4
+    val lastMixed = Note.E4    // Third up from C4
+    
+    // When the directions are different, the rule shouldn't apply
+    rules.noSeventhInSameDirectionRule(
+      secondLastMixed,
+      lastMixed,
+      Note.D4  // Second down from E4 - different direction
+    ) should be(true)  // Allowed because the directions are different
+    
+    // Test with repeating the same note (no direction - rule doesn't apply)
+    val secondLastRepeating = Note.C4
+    val lastRepeating = Note.E4       // Third up from C4
+    
+    // When there's no direction in the second movement (same note), rule doesn't apply
+    rules.noSeventhInSameDirectionRule(
+      secondLastRepeating,
+      lastRepeating,
+      Note.E4  // Same as last note - no direction
+    ) should be(true)  // Allowed because there's no direction
+  }
+  

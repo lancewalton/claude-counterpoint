@@ -28,6 +28,23 @@ case class MelodicRules():
   def notATritoneRule(lastNote: Note, candidate: Note): Boolean =
     getSemitones(lastNote, candidate) != 6
     
+  def noSeventhInSameDirectionRule(
+    secondLastNote: Note,
+    lastNote: Note,
+    candidate: Note
+  ): Boolean =
+    // Check the direction of both movements
+    val lastMovementDirection = getDirection(secondLastNote, lastNote)
+    val candidateMovementDirection = getDirection(lastNote, candidate)
+    
+    // If both movements are in the same direction
+    if lastMovementDirection == candidateMovementDirection && lastMovementDirection != 0 then
+      // Check that the interval from secondLastNote to candidate is not a seventh
+      getIntervalSize(secondLastNote, candidate) != 7
+    else
+      // Rule doesn't apply if directions are different
+      true
+    
   def afterTwoSkipsChangeDirectionRule(
     thirdLastNote: Note, 
     secondLastNote: Note, 
