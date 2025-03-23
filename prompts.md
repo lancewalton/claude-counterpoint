@@ -16,24 +16,22 @@
 - The Melody.toList method should reverse the list. Also, the companion object apply method should take a varargs of notes and create a list, reverse it and then pass it to the Melody constructor.
 - Create an Interval class that calculates the interval between a pair of notes.
 - The interval class should know whether the interval is simple or compound
-Let's try a simpler approach to intervals
-Create a method in Melody to give is a set of valid notes that can be added next. There are rules for this which we'll add incrementally. The first rule is that any note added must be within an octave of the previous note.
-We are only interested in notes in the range G2 to G5. Remove the references to C6.
-The next rule for valid next notes is that intervals of a seventh are disallowed
-Instead of putting all of the rules into one invocation of filter, make a chain of filter calls, one for each rule, and put each predicate into its own method so that the name of the method tells us what the rule is.
-Move the rule predicates to a class called MelodicRules
-Move MelodicRules and MelodicRulesSpec into their own source files.
-The printing in Main is not useful. Stop doing it, remove what's there and make a note in claude.md for future reference
-The rules in MelodicRules need to take into account that intervals are always reckoned upwards from the lowest note for the pair
-The next melodic rule is that the tritone is disallowed
-A skip is a melodic interval of a third or a fourth. A new melodic rule is that two skips in a row in the same direction must be followed by motion in the opposite direction.
-For the rule we just added, instead of passing 	his\ to MelodicRules, call a private method of Melody to determine if there are at least two notes and then pass the last two notes and the new proposed note to MelodicRules
-Always keep the parameters to higher order functions like filter, map, flatMap etc. simple. Do this by delegating. Add this to claude.md.
-Instead of the getLastThreeNotes method and all of those options, use a pattern match on the notes list to handle the different cases.
-Collapse the three cases where there aren't enough notes to trigger the rule down to a default case that returns true
-The first parameter of MelodicRules.afterTwoSkipsChangeDirectionRule does not need to be an Option. Change it to just take a Note.
-The next melodic rule is that when there are two consecutive movements in the same direction (i.e. when the last two notes of the melody move in the same direction as that of the last note of the melody to the candidate note), the candidate note must not be a seventh away from the second to last note of the existing melody.
-
-A skip is an interval of a fifth or larger. Skips must be preceded by a note inside the span of the skip.
-
-The last rule we'll add is that if the last two notes of the melody are a leap, then the candidate note must be within the span of the leap
+- Let's try a simpler approach to intervals
+- Create a method in Melody to give is a set of valid notes that can be added next. There are rules for this which we'll add incrementally. The first rule is that any note added must be within an octave of the previous note.
+- We are only interested in notes in the range G2 to G5. Remove the references to C6.
+- The next rule for valid next notes is that intervals of a seventh are disallowed
+- Instead of putting all of the rules into one invocation of filter, make a chain of filter calls, one for each rule, and put each predicate into its own method so that the name of the method tells us what the rule is.
+- Move the rule predicates to a class called MelodicRules
+- Move MelodicRules and MelodicRulesSpec into their own source files.
+- The printing in Main is not useful. Stop doing it, remove what's there and make a note in claude.md for future reference
+- The rules in MelodicRules need to take into account that intervals are always reckoned upwards from the lowest note for the pair
+- The next melodic rule is that the tritone is disallowed
+- A skip is a melodic interval of a third or a fourth. A new melodic rule is that two skips in a row in the same direction must be followed by motion in the opposite direction.
+- For the rule we just added, instead of passing 	his\ to MelodicRules, call a private method of Melody to determine if there are at least two notes and then pass the last two notes and the new proposed note to MelodicRules
+- Always keep the parameters to higher order functions like filter, map, flatMap etc. simple. Do this by delegating. Add this to claude.md.
+- Instead of the getLastThreeNotes method and all of those options, use a pattern match on the notes list to handle the different cases.
+- Collapse the three cases where there aren't enough notes to trigger the rule down to a default case that returns true
+- The first parameter of MelodicRules.afterTwoSkipsChangeDirectionRule does not need to be an Option. Change it to just take a Note.
+- The next melodic rule is that when there are two consecutive movements in the same direction (i.e. when the last two notes of the melody move in the same direction as that of the last note of the melody to the candidate note), the candidate note must not be a seventh away from the second to last note of the existing melody.
+- A skip is an interval of a fifth or larger. Skips must be preceded by a note inside the span of the skip.
+- The last rule we'll add is that if the last two notes of the melody are a leap, then the candidate note must be within the span of the leap
