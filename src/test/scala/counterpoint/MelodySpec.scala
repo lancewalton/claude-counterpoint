@@ -43,3 +43,39 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     
     melody.toString should be("C4 D4 E4")
   }
+  
+  it should "return C4 through B4 as valid next notes for an empty melody" in {
+    val melody = Melody.empty
+    val validNotes = melody.getValidNextNotes
+    
+    validNotes should contain (Note.C4)
+    validNotes should contain (Note.D4)
+    validNotes should contain (Note.E4)
+    validNotes should contain (Note.F4)
+    validNotes should contain (Note.G4)
+    validNotes should contain (Note.A4)
+    validNotes should contain (Note.B4)
+    validNotes.size should be (7)
+  }
+  
+  it should "return notes that are a step or skip away from the last note" in {
+    val melodyWithC4 = Melody.empty.add(Note.C4)
+    val validNotesAfterC4 = melodyWithC4.getValidNextNotes
+    
+    validNotesAfterC4 should contain (Note.B3)
+    validNotesAfterC4 should contain (Note.D4)
+    validNotesAfterC4 should contain (Note.A3)
+    validNotesAfterC4 should contain (Note.E4)
+    validNotesAfterC4 should not contain (Note.C4)
+    validNotesAfterC4 should not contain (Note.F4)
+    validNotesAfterC4 should not contain (Note.G3)
+    
+    val melodyWithG4 = Melody.empty.add(Note.G4)
+    val validNotesAfterG4 = melodyWithG4.getValidNextNotes
+    
+    validNotesAfterG4 should contain (Note.F4)
+    validNotesAfterG4 should contain (Note.A4)
+    validNotesAfterG4 should contain (Note.E4)
+    validNotesAfterG4 should contain (Note.B4)
+    validNotesAfterG4 should not contain (Note.G4)
+  }
