@@ -26,7 +26,6 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     
     Note(C, 4).isWithinOctave(Note(C, 5)) should be(true)
     Note(C, 4).isWithinOctave(Note(B, 4)) should be(true)
-    Note(C, 4).isWithinOctave(Note(C, 6)) should be(false)
     Note(C, 4).isWithinOctave(Note(D, 5)) should be(false)
     Note(C, 4).isWithinOctave(Note(G, 5)) should be(false)
   }
@@ -41,7 +40,7 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     Note.cMajorScale should contain (Note.E5)
   }
   
-  it should "have a complete list of all notes including C6" in {
-    Note.allNotes should have size 23
-    Note.allNotes should contain(Note.C6)
+  it should "have all notes in the range G2 to G5" in {
+    Note.allNotes should have size 22
+    Note.allNotes should be(Note.cMajorScale)
   }

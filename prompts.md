@@ -18,3 +18,4 @@
 - The interval class should know whether the interval is simple or compound
 Let's try a simpler approach to intervals
 Create a method in Melody to give is a set of valid notes that can be added next. There are rules for this which we'll add incrementally. The first rule is that any note added must be within an octave of the previous note.
+We are only interested in notes in the range G2 to G5. Remove the references to C6.
