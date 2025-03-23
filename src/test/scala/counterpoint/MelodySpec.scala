@@ -96,6 +96,9 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.A4)  // Step up
     melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.C5)  // Skip up
     
+    // Repeating the same note should be allowed
+    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.G4)  // Same note
+    
     // Create a melody with two consecutive descending skips
     val melodyWithTwoDescendingSkips = Melody.empty
       .add(Note.G4)
@@ -109,4 +112,14 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     // Valid next notes should not contain notes that go down
     melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.B3)  // Step down
     melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.G3)  // Skip down
+    
+    // Create a melody with skips in different directions (rule shouldn't apply)
+    val melodyWithMixedSkips = Melody.empty
+      .add(Note.C4)
+      .add(Note.E4)  // Skip up
+      .add(Note.C4)  // Skip down
+    
+    // Should allow notes in both directions
+    melodyWithMixedSkips.validNextNotes should contain(Note.D4)  // Step up
+    melodyWithMixedSkips.validNextNotes should contain(Note.B3)  // Step down
   }

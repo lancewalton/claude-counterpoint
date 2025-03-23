@@ -111,6 +111,14 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
       Note.F4  // Going down
     ) should be(true)
     
+    // After two skips up, staying on the same note should be allowed
+    rules.afterTwoSkipsChangeDirectionRule(
+      thirdLastAscending, 
+      secondLastAscending, 
+      lastAscending, 
+      Note.G4  // Same note
+    ) should be(true)
+    
     // Test descending pattern
     val thirdLastDescending = Note.G4
     val secondLastDescending = Note.E4  // Third down from G4
@@ -131,4 +139,102 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
       lastDescending, 
       Note.D4  // Going up
     ) should be(true)
+    
+    // Test mixed directions (rule shouldn't apply)
+    val mixedDirectionThird = Note.C4
+    val mixedDirectionSecond = Note.E4  // Third up
+    val mixedDirectionLast = Note.C4    // Third down
+    
+    // When skips are in different directions, the rule shouldn't apply
+    rules.afterTwoSkipsChangeDirectionRule(
+      mixedDirectionThird,
+      mixedDirectionSecond,
+      mixedDirectionLast,
+      Note.A3  // Going down
+    ) should be(true)  // Allowed because the previous skips weren't in same direction
+    
+    // Test with non-skip intervals
+    val nonSkipThird = Note.C4
+    val nonSkipSecond = Note.D4  // Second (not a skip)
+    val nonSkipLast = Note.G4    // Fourth (is a skip)
+    
+    // When one of the two previous intervals isn't a skip
+    rules.afterTwoSkipsChangeDirectionRule(
+      nonSkipThird,
+      nonSkipSecond,
+      nonSkipLast,
+      Note.C5  // Going up
+    ) should be(true)  // Allowed because we don't have two consecutive skips
+  }
+  
+  it should "apply the consecutive skips not spanning seventh rule correctly" in {
+    val rules = MelodicRules()
+    
+    // Test with ascending skips that would span a seventh
+    val thirdLastAscending = Note.C4
+    val secondLastAscending = Note.E4  // Third up from C4
+    val lastAscending = Note.G4       // Third up from E4
+    
+    // C4 -> E4 -> G4 -> B4 would span C4 to B4, which is a seventh
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      thirdLastAscending,
+      secondLastAscending,
+      lastAscending,
+      Note.B4  // Third up from G4, total span is a seventh (C4 -> B4)
+    ) should be(false)
+    
+    // C4 -> E4 -> G4 -> A4 would span C4 to A4, which is a sixth - allowed
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      thirdLastAscending,
+      secondLastAscending,
+      lastAscending,
+      Note.A4  // Step up from G4, total span is not a seventh
+    ) should be(true)
+    
+    // Test with descending skips that would span a seventh
+    val thirdLastDescending = Note.B4
+    val secondLastDescending = Note.G4  // Third down from B4
+    val lastDescending = Note.E4       // Third down from G4
+    
+    // B4 -> G4 -> E4 -> C4 would span B4 to C4, which is a seventh
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      thirdLastDescending,
+      secondLastDescending,
+      lastDescending,
+      Note.C4  // Third down from E4, total span is a seventh (B4 -> C4)
+    ) should be(false)
+    
+    // B4 -> G4 -> E4 -> D4 would span B4 to D4, which is a sixth - allowed
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      thirdLastDescending,
+      secondLastDescending,
+      lastDescending,
+      Note.D4  // Step down from E4, total span is not a seventh
+    ) should be(true)
+    
+    // Test with mixed direction skips (rule shouldn't apply)
+    val mixedDirectionThird = Note.C4
+    val mixedDirectionSecond = Note.E4  // Third up from C4
+    val mixedDirectionLast = Note.C4    // Third down from E4
+    
+    // When skips are in different directions, the rule shouldn't apply
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      mixedDirectionThird,
+      mixedDirectionSecond,
+      mixedDirectionLast,
+      Note.A3  // Descending skip from C4
+    ) should be(true)  // Allowed because the previous skips weren't in same direction
+    
+    // Test with non-skip intervals
+    val nonSkipThird = Note.C4
+    val nonSkipSecond = Note.D4  // Second (not a skip)
+    val nonSkipLast = Note.G4    // Fourth (is a skip)
+    
+    // When one of the intervals isn't a skip or the final note isn't part of a skip
+    rules.consecutiveSkipsNotSpanningSeventhRule(
+      nonSkipThird,
+      nonSkipSecond,
+      nonSkipLast,
+      Note.C5  // Skip up from G4
+    ) should be(true)  // Allowed because we don't have three consecutive skips
   }

@@ -28,6 +28,18 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
           candidateNote
         )
       case _ => true  // Not enough notes to trigger the rule
+      
+  private def meetsConsecutiveSkipsSpanRule(candidateNote: Note): Boolean =
+    toList match
+      case thirdLast :: secondLast :: last :: _ =>
+        // Three or more notes, check the rule
+        rules.consecutiveSkipsNotSpanningSeventhRule(
+          thirdLast,
+          secondLast,
+          last,
+          candidateNote
+        )
+      case _ => true  // Not enough notes to trigger the rule
   
   def validNextNotes: List[Note] =
     if notes.isEmpty then
@@ -38,6 +50,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
         .filter(meetsNoSeventhRule)
         .filter(meetsNoTritoneRule)
         .filter(meetsConsecutiveSkipsRule)
+        .filter(meetsConsecutiveSkipsSpanRule)
   
   override def toString: String = toList.mkString(" ")
 
