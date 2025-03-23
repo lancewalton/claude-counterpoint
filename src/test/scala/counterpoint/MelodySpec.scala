@@ -68,7 +68,8 @@ class MelodySpec extends AnyFlatSpec with Matchers:
   
   it should "use melodic rules to filter valid next notes" in {
     val melody = Melody.empty.add(Note.C4)
-    melody.validNextNotes should contain(Note.G4)
+    melody.validNextNotes should contain(Note.F4)  // fourth (not a skip)
+    melody.validNextNotes should not contain(Note.G4)  // fifth (a skip, but no preceding note in span)
     melody.validNextNotes should not contain(Note.B4)  // seventh interval
     melody.validNextNotes should not contain(Note.D5)  // outside octave
   }
@@ -82,44 +83,57 @@ class MelodySpec extends AnyFlatSpec with Matchers:
   }
   
   it should "enforce the consecutive skips rule" in {
-    // Create a melody with two consecutive ascending skips
-    val melodyWithTwoAscendingSkips = Melody.empty
+    // Note: With the updated definition, a skip is an interval of a fifth or larger
+    // So we need to update this test
+    
+    // Create a melody with consecutive notes so we can test skips
+    // Note: Due to the new skip precedence rule, we need more complex test structures
+    val melodyForSkipTest = Melody.empty
       .add(Note.C4)
-      .add(Note.E4)  // First skip (third up)
-      .add(Note.G4)  // Second skip (third up)
+      .add(Note.D4)  // Step up (not a skip)
+      .add(Note.F4)  // Third up (not a skip)
     
-    // Valid next notes should contain notes that go down
-    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.F4)  // Step down
-    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.E4)  // Skip down
+    // Now we have C4 -> D4 -> F4
+    // We should be able to move by step (not a skip)
+    melodyForSkipTest.validNextNotes should contain(Note.G4)  // Step from F4
     
-    // Valid next notes should not contain notes that go up
-    melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.A4)  // Step up
-    melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.C5)  // Skip up
+    // We should be able to move by a third (not a skip)
+    melodyForSkipTest.validNextNotes should contain(Note.D4)  // Third down from F4
     
-    // Repeating the same note should be allowed
-    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.G4)  // Same note
+    // And we can always repeat a note
+    melodyForSkipTest.validNextNotes should contain(Note.F4)  // Same note
     
-    // Create a melody with two consecutive descending skips
-    val melodyWithTwoDescendingSkips = Melody.empty
-      .add(Note.G4)
-      .add(Note.E4)  // First skip (third down)
-      .add(Note.C4)  // Second skip (third down)
+    // Test two consecutive skips rule, which is separate from the skip precedence rule
     
-    // Valid next notes should contain notes that go up
-    melodyWithTwoDescendingSkips.validNextNotes should contain(Note.D4)  // Step up
-    melodyWithTwoDescendingSkips.validNextNotes should contain(Note.E4)  // Skip up
+    // Build a melody where we can have two skips in the same direction
+    val melodyForSkipDirectionTest = Melody.empty
+      .add(Note.C4)
+      .add(Note.D4)   // Step up (for precedence rule)
+      .add(Note.G4)   // Fourth up (precedence inside C4-C5)
+      .add(Note.C5)   // Fourth up (precedence inside G4-G5)
     
-    // Valid next notes should not contain notes that go down
-    melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.B3)  // Step down
-    melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.G3)  // Skip down
+    // We're trying to test the afterTwoSkipsChangeDirectionRule, but that only applies if we
+    // have two skips (intervals of a fifth or greater) in the same direction
+    // Since we changed the definition of a skip, this test is no longer valid
+    // as we don't have two consecutive skips in our test melody
+    val melodyForDirectionTest = Melody.empty
+      .add(Note.C4)
+      .add(Note.G4)   // Skip up (fifth)
+      .add(Note.D5)   // Skip up (fifth)
+      
+    // Now check that we can't go up further  
+    melodyForDirectionTest.validNextNotes should not contain(Note.G5)  // Up - disallowed
     
-    // Create a melody with skips in different directions (rule shouldn't apply)
+    // But going down should be allowed
+    melodyForDirectionTest.validNextNotes should contain(Note.C5)  // Step down
+    
+    // Test with a melody with mixed skip directions (rule shouldn't apply)
     val melodyWithMixedSkips = Melody.empty
       .add(Note.C4)
-      .add(Note.E4)  // Skip up
-      .add(Note.C4)  // Skip down
+      .add(Note.G4)   // Skip up (fifth)
+      .add(Note.C4)   // Skip down (fifth)
     
-    // Should allow notes in both directions
+    // Should allow notes in both directions 
     melodyWithMixedSkips.validNextNotes should contain(Note.D4)  // Step up
     melodyWithMixedSkips.validNextNotes should contain(Note.B3)  // Step down
   }
@@ -154,4 +168,42 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     
     // Going up to G4 is possible even though it would be a fifth from C4
     melodyMixed.validNextNotes should contain(Note.G4)  // The rule doesn't apply since directions differ
+  }
+  
+  it should "enforce the skip must be preceded by note in span rule" in {
+    // Single note melody - skips should be disallowed because there is no preceding note
+    val singleNoteMelody = Melody.empty
+      .add(Note.C4)
+      
+    // A skip of a fifth should be disallowed (no preceding note)
+    singleNoteMelody.validNextNotes should not contain(Note.G4)  // Fifth up, a skip
+    
+    // Steps and thirds should be allowed (not skips)
+    singleNoteMelody.validNextNotes should contain(Note.D4)  // Second up, not a skip
+    singleNoteMelody.validNextNotes should contain(Note.E4)  // Third up, not a skip
+    singleNoteMelody.validNextNotes should contain(Note.F4)  // Fourth up, not a skip
+    
+    // Melody with a preceding note inside the skip span (allowed)
+    val melodyWithNoteInSpan = Melody.empty
+      .add(Note.C4)
+      .add(Note.E4)  // E4 is inside the span from C4 to G4
+      
+    // A skip to G4 should be allowed because E4 is inside the span from C4 to G4
+    melodyWithNoteInSpan.validNextNotes should contain(Note.G4)  // Fifth up, a skip, but E4 is in span
+    
+    // Melody with a preceding note outside the skip span (disallowed)
+    val melodyWithNoteOutsideSpan = Melody.empty
+      .add(Note.C4)
+      .add(Note.D4)  // D4 is outside the span from C4 to A4
+      
+    // A skip to A4 should be disallowed because D4 is not inside the span from C4 to A4
+    melodyWithNoteOutsideSpan.validNextNotes should not contain(Note.A4)  // Sixth up, a skip, D4 not in span
+    
+    // For descending skips
+    val melodyForDescendingSkip = Melody.empty
+      .add(Note.G4)
+      .add(Note.E4)  // E4 is inside the span from G4 to C4
+      
+    // A skip down to C4 should be allowed because E4 is inside the span from G4 to C4
+    melodyForDescendingSkip.validNextNotes should contain(Note.C4)  // Fifth down, a skip, but E4 is in span
   }

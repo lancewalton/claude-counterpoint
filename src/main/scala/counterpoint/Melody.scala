@@ -39,6 +39,24 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
           candidateNote
         )
       case _ => true  // Not enough notes to trigger the rule
+      
+  private def meetsSkipPrecedenceRule(candidateNote: Note): Boolean =
+    toList match
+      case secondLast :: last :: _ =>
+        // Two or more notes, check the rule with the second-last note
+        rules.skipMustBePrecededByNoteInSpanRule(
+          last,
+          candidateNote,
+          Some(secondLast)
+        )
+      case last :: Nil =>
+        // Only one note, no preceding note to check against
+        rules.skipMustBePrecededByNoteInSpanRule(
+          last,
+          candidateNote,
+          None
+        )
+      case _ => true  // Empty melody, no notes to check against
   
   def validNextNotes: List[Note] =
     if notes.isEmpty then
@@ -50,6 +68,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
         .filter(meetsNoTritoneRule)
         .filter(meetsConsecutiveSkipsRule)
         .filter(meetsNoSeventhInSameDirectionRule)
+        .filter(meetsSkipPrecedenceRule)
   
   override def toString: String = toList.mkString(" ")
 
