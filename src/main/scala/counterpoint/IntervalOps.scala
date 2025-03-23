@@ -46,8 +46,11 @@ object IntervalOps:
     interval == 3 || interval == 4  // Only actual thirds and fourths are skips, not compound versions
     
   def isLeap(note1: Note, note2: Note): Boolean =
+    val intervalSize = getIntervalSize(note1, note2)
     val simpleInterval = getSimpleIntervalSize(note1, note2)
-    simpleInterval >= 5  // Any interval of a fifth or larger is a leap (including octave)
+    
+    // Both compound intervals and intervals of a fifth or larger are leaps
+    intervalSize > 8 || simpleInterval >= 5  // Any interval of a fifth or larger is a leap (including octave)
     
   def isMelodicStep(from: Note, to: Note): Boolean =
     val semitones = math.abs(to.midiNumber - from.midiNumber)
