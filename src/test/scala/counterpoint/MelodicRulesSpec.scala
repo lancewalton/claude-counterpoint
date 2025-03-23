@@ -33,27 +33,45 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
   it should "identify skips correctly" in {
     val rules = MelodicRules()
     
-    // Fifths are skips
-    rules.isSkip(Note.C4, Note.G4) should be(true)  // perfect fifth
+    // Thirds are skips
+    rules.isSkip(Note.C4, Note.E4) should be(true)  // major third
+    rules.isSkip(Note.A4, Note.C5) should be(true)  // minor third
     
-    // Sixths are skips
-    rules.isSkip(Note.C4, Note.A4) should be(true)  // major sixth
-    
-    // Sevenths are skips
-    rules.isSkip(Note.C4, Note.B4) should be(true)  // major seventh
-    
-    // Octaves are skips (C4 to C5 is 12 semitones, which is considered an octave, not beyond)
-    rules.isSkip(Note.C4, Note.C5) should be(false)  // octave (not a skip based on our rule interpretation)
-    
-    // Thirds are not skips
-    rules.isSkip(Note.C4, Note.E4) should be(false)  // major third
-    rules.isSkip(Note.A4, Note.C5) should be(false)  // minor third
-    
-    // Fourths are not skips
-    rules.isSkip(Note.C4, Note.F4) should be(false)  // perfect fourth
+    // Fourths are skips
+    rules.isSkip(Note.C4, Note.F4) should be(true)  // perfect fourth
     
     // Seconds are not skips
     rules.isSkip(Note.C4, Note.D4) should be(false)  // major second
+    
+    // Fifths and larger are not skips (they're leaps)
+    rules.isSkip(Note.C4, Note.G4) should be(false)  // perfect fifth
+    rules.isSkip(Note.C4, Note.A4) should be(false)  // major sixth
+  }
+  
+  it should "identify leaps correctly" in {
+    val rules = MelodicRules()
+    
+    // Fifths are leaps
+    rules.isLeap(Note.C4, Note.G4) should be(true)  // perfect fifth
+    
+    // Sixths are leaps
+    rules.isLeap(Note.C4, Note.A4) should be(true)  // major sixth
+    
+    // Sevenths are leaps
+    rules.isLeap(Note.C4, Note.B4) should be(true)  // major seventh
+    
+    // Octaves are leaps
+    rules.isLeap(Note.C4, Note.C5) should be(false)  // octave - not a leap for our implementation
+    
+    // Thirds are not leaps
+    rules.isLeap(Note.C4, Note.E4) should be(false)  // major third
+    rules.isLeap(Note.A4, Note.C5) should be(false)  // minor third
+    
+    // Fourths are not leaps
+    rules.isLeap(Note.C4, Note.F4) should be(false)  // perfect fourth
+    
+    // Seconds are not leaps
+    rules.isLeap(Note.C4, Note.D4) should be(false)  // major second
   }
   
   it should "apply the within octave rule" in {
@@ -99,17 +117,17 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
   it should "apply the two skips rule correctly" in {
     val rules = MelodicRules()
     
-    // Test ascending pattern with new skip definition (fifth or larger)
+    // Test ascending pattern with skips (thirds and fourths)
     val thirdLastAscending = Note.C4
-    val secondLastAscending = Note.G4  // Fifth up from C4
-    val lastAscending = Note.D5       // Fifth up from G4
+    val secondLastAscending = Note.E4  // Third up from C4
+    val lastAscending = Note.A4       // Fourth up from E4
     
     // After two skips up, going up further should be disallowed
     rules.afterTwoSkipsChangeDirectionRule(
       thirdLastAscending, 
       secondLastAscending, 
       lastAscending, 
-      Note.G5  // Going up (G5 is the highest note in our range)
+      Note.C5  // Going up
     ) should be(false)
     
     // After two skips up, going down should be allowed
@@ -117,7 +135,7 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
       thirdLastAscending, 
       secondLastAscending, 
       lastAscending, 
-      Note.G4  // Going down
+      Note.F4  // Going down
     ) should be(true)
     
     // After two skips up, staying on the same note should be allowed
@@ -125,20 +143,20 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
       thirdLastAscending, 
       secondLastAscending, 
       lastAscending, 
-      Note.D5  // Same note
+      Note.A4  // Same note
     ) should be(true)
     
     // Test descending pattern
-    val thirdLastDescending = Note.D5
-    val secondLastDescending = Note.G4  // Fifth down from D5
-    val lastDescending = Note.C4       // Fifth down from G4
+    val thirdLastDescending = Note.G4
+    val secondLastDescending = Note.E4  // Third down from G4
+    val lastDescending = Note.B3       // Fourth down from E4
     
     // After two skips down, going down further should be disallowed
     rules.afterTwoSkipsChangeDirectionRule(
       thirdLastDescending, 
       secondLastDescending, 
       lastDescending, 
-      Note.F3  // Going down
+      Note.G3  // Going down
     ) should be(false)
     
     // After two skips down, going up should be allowed
@@ -146,33 +164,33 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
       thirdLastDescending, 
       secondLastDescending, 
       lastDescending, 
-      Note.G4  // Going up
+      Note.C4  // Going up
     ) should be(true)
     
     // Test mixed directions (rule shouldn't apply)
     val mixedDirectionThird = Note.C4
-    val mixedDirectionSecond = Note.G4  // Fifth up
-    val mixedDirectionLast = Note.C4    // Fifth down
+    val mixedDirectionSecond = Note.E4  // Third up (skip)
+    val mixedDirectionLast = Note.C4    // Third down (skip)
     
     // When skips are in different directions, the rule shouldn't apply
     rules.afterTwoSkipsChangeDirectionRule(
       mixedDirectionThird,
       mixedDirectionSecond,
       mixedDirectionLast,
-      Note.F3  // Going down
+      Note.A3  // Going down
     ) should be(true)  // Allowed because the previous skips weren't in same direction
     
-    // Test with non-skip intervals (now a fourth is not a skip)
+    // Test with non-skip intervals
     val nonSkipThird = Note.C4
-    val nonSkipSecond = Note.F4  // Fourth (not a skip with new definition)
-    val nonSkipLast = Note.C5    // Fifth (is a skip)
+    val nonSkipSecond = Note.D4  // Second (not a skip)
+    val nonSkipLast = Note.G4    // Fourth (is a skip)
     
     // When one of the two previous intervals isn't a skip
     rules.afterTwoSkipsChangeDirectionRule(
       nonSkipThird,
       nonSkipSecond,
       nonSkipLast,
-      Note.G5  // Going up (G5 is the highest note in our range)
+      Note.C5  // Going up
     ) should be(true)  // Allowed because we don't have two consecutive skips
   }
   
@@ -245,53 +263,118 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     ) should be(true)  // Allowed because there's no direction
   }
   
-  it should "apply the skip must be preceded by note in span rule correctly" in {
+  it should "apply the leap must be preceded by note in span rule correctly" in {
     val rules = MelodicRules()
     
-    // Test skip with a preceding note inside the span
+    // Test leap with a preceding note inside the span
     val lastNote = Note.E4
-    val candidateNoteSkip = Note.C5  // Skip of a fifth (E4 to C5)
+    val candidateNoteLeap = Note.C5  // Leap of a fifth (E4 to C5)
     val precedingNoteInside = Note.G4  // G4 is inside the span from E4 to C5
     
-    rules.skipMustBePrecededByNoteInSpanRule(
+    rules.leapMustBePrecededByNoteInSpanRule(
       lastNote,
-      candidateNoteSkip,
+      candidateNoteLeap,
       Some(precedingNoteInside)
     ) should be(true)  // Allowed because G4 is inside E4 to C5
     
-    // Test skip with a preceding note outside the span
+    // Test leap with a preceding note outside the span
     val precedingNoteOutside = Note.D4  // D4 is outside the span from E4 to C5
     
-    rules.skipMustBePrecededByNoteInSpanRule(
+    rules.leapMustBePrecededByNoteInSpanRule(
       lastNote,
-      candidateNoteSkip,
+      candidateNoteLeap,
       Some(precedingNoteOutside)
     ) should be(false)  // Disallowed because D4 is outside E4 to C5
     
-    // Test descending skip with a preceding note inside the span
-    val candidateNoteDescending = Note.A3  // Skip of a fifth down (E4 to A3)
+    // Test descending leap with a preceding note inside the span
+    val candidateNoteDescending = Note.A3  // Leap of a fifth down (E4 to A3)
     val precedingNoteInsideDescending = Note.C4  // C4 is inside the span from E4 to A3
     
-    rules.skipMustBePrecededByNoteInSpanRule(
+    rules.leapMustBePrecededByNoteInSpanRule(
       lastNote,
       candidateNoteDescending,
       Some(precedingNoteInsideDescending)
     ) should be(true)  // Allowed because C4 is inside E4 to A3
     
     // Test with no preceding note (for first interval in melody)
-    rules.skipMustBePrecededByNoteInSpanRule(
+    rules.leapMustBePrecededByNoteInSpanRule(
       lastNote,
-      candidateNoteSkip,
+      candidateNoteLeap,
       None
     ) should be(false)  // Disallowed because there's no preceding note
     
-    // Test with a non-skip interval (rule doesn't apply)
-    val candidateNoteNonSkip = Note.G4  // Third up from E4, not a skip
+    // Test with a non-leap interval (rule doesn't apply)
+    val candidateNoteNonLeap = Note.F4  // Second up from E4, not a leap
     
-    rules.skipMustBePrecededByNoteInSpanRule(
+    rules.leapMustBePrecededByNoteInSpanRule(
       lastNote,
-      candidateNoteNonSkip,
+      candidateNoteNonLeap,
       Some(precedingNoteOutside)
-    ) should be(true)  // Allowed because it's not a skip
+    ) should be(true)  // Allowed because it's not a leap
+  }
+  
+  it should "apply the after leap note in span rule correctly" in {
+    val rules = MelodicRules()
+    
+    // Test ascending leap
+    val secondLastAscendingLeap = Note.C4
+    val lastAscendingLeap = Note.G4       // Fifth up from C4 (a leap)
+    
+    // C4 -> G4 -> E4 would put E4 inside the span of the leap - allowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastAscendingLeap,
+      lastAscendingLeap,
+      Note.E4  // Inside the span from C4 to G4
+    ) should be(true)
+    
+    // C4 -> G4 -> B4 would put B4 outside the span of the leap - disallowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastAscendingLeap,
+      lastAscendingLeap,
+      Note.B4  // Outside the span from C4 to G4
+    ) should be(false)
+    
+    // C4 -> G4 -> A3 would put A3 outside the span of the leap - disallowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastAscendingLeap,
+      lastAscendingLeap,
+      Note.A3  // Outside the span from C4 to G4
+    ) should be(false)
+    
+    // Test descending leap
+    val secondLastDescendingLeap = Note.G4
+    val lastDescendingLeap = Note.C4       // Fifth down from G4 (a leap)
+    
+    // G4 -> C4 -> E4 would put E4 inside the span of the leap - allowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastDescendingLeap,
+      lastDescendingLeap,
+      Note.E4  // Inside the span from G4 to C4
+    ) should be(true)
+    
+    // G4 -> C4 -> B3 would put B3 outside the span of the leap - disallowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastDescendingLeap,
+      lastDescendingLeap,
+      Note.B3  // Outside the span from G4 to C4
+    ) should be(false)
+    
+    // G4 -> C4 -> A4 would put A4 outside the span of the leap - disallowed
+    rules.afterLeapNoteInSpanRule(
+      secondLastDescendingLeap,
+      lastDescendingLeap,
+      Note.A4  // Outside the span from G4 to C4
+    ) should be(false)
+    
+    // Test with a non-leap interval (rule doesn't apply)
+    val secondLastNonLeap = Note.C4
+    val lastNonLeap = Note.E4       // Third up from C4 (not a leap)
+    
+    // When the previous interval isn't a leap, the rule doesn't apply
+    rules.afterLeapNoteInSpanRule(
+      secondLastNonLeap,
+      lastNonLeap,
+      Note.G4  // Doesn't matter, rule doesn't apply
+    ) should be(true)  // Allowed because there's no leap
   }
   

@@ -17,6 +17,10 @@ case class MelodicRules():
     
   def isSkip(note1: Note, note2: Note): Boolean =
     val interval = getIntervalSize(note1, note2)
+    interval == 3 || interval == 4
+    
+  def isLeap(note1: Note, note2: Note): Boolean =
+    val interval = getIntervalSize(note1, note2)
     interval >= 5
   
   def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
@@ -45,13 +49,13 @@ case class MelodicRules():
       // Rule doesn't apply if directions are different
       true
       
-  def skipMustBePrecededByNoteInSpanRule(
+  def leapMustBePrecededByNoteInSpanRule(
     lastNote: Note,
     candidate: Note,
     secondLastNote: Option[Note]
   ): Boolean =
-    // Check if the interval is a skip
-    if isSkip(lastNote, candidate) then
+    // Check if the interval is a leap
+    if isLeap(lastNote, candidate) then
       secondLastNote match
         case Some(secondLast) =>
           // If we have a second last note, check if it's inside the span
@@ -61,7 +65,20 @@ case class MelodicRules():
           // If this is the first interval, no preceding note to check
           false
     else
-      // Not a skip, so rule doesn't apply
+      // Not a leap, so rule doesn't apply
+      true
+      
+  def afterLeapNoteInSpanRule(
+    secondLastNote: Note,
+    lastNote: Note,
+    candidate: Note
+  ): Boolean =
+    // Check if there's a leap between the second last and last notes
+    if isLeap(secondLastNote, lastNote) then
+      // If there was a leap, check if the candidate is within the span
+      isNoteInsideSpan(candidate, secondLastNote, lastNote)
+    else
+      // Not a leap, so the rule doesn't apply
       true
       
   private def isNoteInsideSpan(middleNote: Note, fromNote: Note, toNote: Note): Boolean =
