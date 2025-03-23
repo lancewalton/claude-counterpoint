@@ -5,5 +5,6 @@
 * Don't produce code unless it is needed
 * Do not add any comments to the code
 * Run all the tests to make sure everything works after (or during) doing the work for each prompt
-* When the work is complete for each prompt, do "git add .", then commit using the pattern "Prompt: " followed by the prompt that caused the work to be done, and then push the code to github 
+* When the work is complete for each prompt, do "git add .", then commit using the pattern "Prompt: " followed by the prompt that caused the work to be done
+* Keep the Main.scala file clean without debug printing code
 

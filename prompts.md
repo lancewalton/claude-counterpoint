@@ -23,3 +23,4 @@ The next rule for valid next notes is that intervals of a seventh are disallowed
 Instead of putting all of the rules into one invocation of filter, make a chain of filter calls, one for each rule, and put each predicate into its own method so that the name of the method tells us what the rule is.
 Move the rule predicates to a class called MelodicRules
 Move MelodicRules and MelodicRulesSpec into their own source files.
+The printing in Main is not useful. Stop doing it, remove what's there and make a note in claude.md for future reference
