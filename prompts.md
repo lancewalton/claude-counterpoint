@@ -35,3 +35,4 @@
 - The next melodic rule is that when there are two consecutive movements in the same direction (i.e. when the last two notes of the melody move in the same direction as that of the last note of the melody to the candidate note), the candidate note must not be a seventh away from the second to last note of the existing melody.
 - A skip is an interval of a fifth or larger. Skips must be preceded by a note inside the span of the skip.
 - The last rule we'll add is that if the last two notes of the melody are a leap, then the candidate note must be within the span of the leap
+- In MelodicRules.isLeap, octaves should be treated as leaps.
