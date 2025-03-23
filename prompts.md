@@ -6,3 +6,4 @@
 - Please generate the code to represent the Notes of the C major scale for G2 to G5.
 - The C major scale has no sharps or flats. Can you remove them?
 - Move NoteName, Note and Notes into another file called Note.scala
+- The tests for Note and Notes should be moved to a file called NoteSpec
