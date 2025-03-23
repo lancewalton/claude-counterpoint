@@ -3,6 +3,26 @@ package counterpoint
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+class MelodicRulesSpec extends AnyFlatSpec with Matchers:
+  "MelodicRules" should "apply the within octave rule" in {
+    val rules = MelodicRules()
+    val note = Note.C4
+    
+    rules.isWithinOctaveRule(note, Note.C3) should be(true)
+    rules.isWithinOctaveRule(note, Note.C5) should be(true)
+    rules.isWithinOctaveRule(note, Note.D5) should be(false)
+  }
+  
+  it should "apply the not a seventh rule" in {
+    val rules = MelodicRules()
+    
+    rules.notASeventhRule(Note.C4, Note.B4) should be(false)
+    rules.notASeventhRule(Note.C4, Note.G4) should be(true)
+    
+    rules.notASeventhRule(Note.D4, Note.C5) should be(false)
+    rules.notASeventhRule(Note.F4, Note.E5) should be(false)
+  }
+
 class MelodySpec extends AnyFlatSpec with Matchers:
   "Melody" should "start empty when created with empty" in {
     val melody = Melody.empty
@@ -66,28 +86,9 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     melodyWithHighNote.validNextNotes should contain(Note.G4)
   }
   
-  it should "apply the within octave rule" in {
-    val note = Note.C4
-    
-    Melody.empty.isWithinOctaveRule(note, Note.C3) should be(true)
-    Melody.empty.isWithinOctaveRule(note, Note.C5) should be(true)
-    Melody.empty.isWithinOctaveRule(note, Note.D5) should be(false)
-  }
-  
-  it should "apply the not a seventh rule" in {
-    val melodyWithC4 = Melody.empty.add(Note.C4)
-    // B4 is a seventh from C4
-    melodyWithC4.validNextNotes should not contain(Note.B4)
-    
-    val melodyWithD4 = Melody.empty.add(Note.D4)
-    // C5 is a seventh from D4
-    melodyWithD4.validNextNotes should not contain(Note.C5)
-    
-    val melodyWithF4 = Melody.empty.add(Note.F4)
-    // E5 is a seventh from F4
-    melodyWithF4.validNextNotes should not contain(Note.E5)
-    
-    // Test the actual rule method
-    Melody.empty.notASeventhRule(Note.C4, Note.B4) should be(false)
-    Melody.empty.notASeventhRule(Note.C4, Note.G4) should be(true)
+  it should "use melodic rules to filter valid next notes" in {
+    val melody = Melody.empty.add(Note.C4)
+    melody.validNextNotes should contain(Note.G4)
+    melody.validNextNotes should not contain(Note.B4)  // seventh interval
+    melody.validNextNotes should not contain(Note.D5)  // outside octave
   }
