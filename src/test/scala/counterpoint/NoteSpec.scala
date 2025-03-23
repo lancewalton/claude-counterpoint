@@ -18,7 +18,6 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     Note.cMajorScale.head should be (Note.G2)
     Note.cMajorScale.last should be (Note.G5)
     
-    // Check some specific notes
     Note.cMajorScale should contain (Note.C4)
     Note.cMajorScale should contain (Note.G3)
     Note.cMajorScale should contain (Note.E5)

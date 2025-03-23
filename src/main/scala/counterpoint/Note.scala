@@ -9,7 +9,6 @@ case class Note(name: NoteName, octave: Int):
 object Note:
   import NoteName.*
   
-  // C Major scale notes from G2 to G5
   val G2 = Note(G, 2)
   val A2 = Note(A, 2)
   val B2 = Note(B, 2)
@@ -33,7 +32,6 @@ object Note:
   val F5 = Note(F, 5)
   val G5 = Note(G, 5)
   
-  // C Major scale
   val cMajorScale: List[Note] = List(
     G2, A2, B2, 
     C3, D3, E3, F3, G3, A3, B3,

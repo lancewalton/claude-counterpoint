@@ -18,7 +18,6 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     
     val melody = Melody.empty.add(c4).add(d4).add(e4)
     
-    // Notes should be in order of adding (first note added is first in list)
     melody.toList should be(List(c4, d4, e4))
   }
   
@@ -36,13 +35,11 @@ class MelodySpec extends AnyFlatSpec with Matchers:
   
   it should "handle toList method correctly" in {
     val melody = Melody.empty
-      .add(Note.C4)  // First added
-      .add(Note.D4)  // Second added
-      .add(Note.E4)  // Third added
+      .add(Note.C4)
+      .add(Note.D4)
+      .add(Note.E4)
       
-    // toList should return notes in the order they were added
     melody.toList should be(List(Note.C4, Note.D4, Note.E4))
     
-    // toString should use the same order
     melody.toString should be("C4 D4 E4")
   }
