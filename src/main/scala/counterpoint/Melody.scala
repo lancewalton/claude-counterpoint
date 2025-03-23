@@ -10,7 +10,10 @@ case class Melody private (private val notes: List[Note]):
       Note.allNotes
     else
       val lastNote = notes.head
-      Note.allNotes.filter(note => lastNote.isWithinOctave(note))
+      Note.allNotes.filter(note => 
+        lastNote.isWithinOctave(note) && 
+        lastNote.intervalSize(note) != 7  // disallow intervals of a seventh
+      )
   
   override def toString: String = toList.mkString(" ")
 

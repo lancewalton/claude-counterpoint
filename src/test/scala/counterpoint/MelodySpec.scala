@@ -65,3 +65,17 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     // G5 should have valid next notes
     melodyWithHighNote.validNextNotes should contain(Note.G4)
   }
+  
+  it should "disallow intervals of a seventh" in {
+    val melodyWithC4 = Melody.empty.add(Note.C4)
+    // B4 is a seventh from C4
+    melodyWithC4.validNextNotes should not contain(Note.B4)
+    
+    val melodyWithD4 = Melody.empty.add(Note.D4)
+    // C5 is a seventh from D4
+    melodyWithD4.validNextNotes should not contain(Note.C5)
+    
+    val melodyWithF4 = Melody.empty.add(Note.F4)
+    // E5 is a seventh from F4
+    melodyWithF4.validNextNotes should not contain(Note.E5)
+  }

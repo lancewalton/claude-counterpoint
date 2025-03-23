@@ -26,3 +26,7 @@ package counterpoint
   
   val melodyWithG5 = Melody.empty.add(Note.G5)
   println(s"Valid notes after G5: ${melodyWithG5.validNextNotes.mkString(", ")}")
+  
+  println("\nShowing the disallowed intervals of a seventh:")
+  println(s"C4 to B4 is an interval of size: ${Note.C4.intervalSize(Note.B4)}")
+  println(s"Is B4 in valid next notes after C4? ${melodyWithC4.validNextNotes.contains(Note.B4)}")
