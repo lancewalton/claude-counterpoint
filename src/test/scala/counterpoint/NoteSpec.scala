@@ -44,10 +44,10 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     Note(C, 4).intervalSize(Note(C, 5)) should be(8)  // octave
     
     // Test both ascending and descending intervals
-    // G4 to C5 is a fourth (5 semitones up)
+    // G4 to C5 is a perfect fourth (5 semitones)
     Note(G, 4).intervalSize(Note(C, 5)) should be(4)
-    // C5 to G4 is a fifth (7 semitones down)
-    Note(C, 5).intervalSize(Note(G, 4)) should be(5)
+    // C5 to G4 is a perfect fourth (5 semitones)
+    Note(C, 5).intervalSize(Note(G, 4)) should be(4)
     
     // Test compound intervals
     Note(C, 4).intervalSize(Note(D, 5)) should be(9)  // compound second (ninth)
