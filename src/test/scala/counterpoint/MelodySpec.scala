@@ -48,3 +48,21 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     
     melody.toList should be(List(Note.C4, Note.D4, Note.E4))
   }
+  
+  it should "provide a list of valid next notes" in {
+    val emptyMelody = Melody.empty
+    emptyMelody.validNextNotes should be(Note.allNotes)
+    
+    val melodyWithC4 = Melody.empty.add(Note.C4)
+    melodyWithC4.validNextNotes should contain(Note.C5)
+    melodyWithC4.validNextNotes should contain(Note.C3)
+    melodyWithC4.validNextNotes should not contain(Note.C6)
+    
+    val melodyWithG4 = Melody.empty.add(Note.G4)
+    melodyWithG4.validNextNotes should contain(Note.G5)
+    melodyWithG4.validNextNotes should contain(Note.G3)
+    
+    val melodyWithHighNote = Melody.empty.add(Note.G5)
+    // C6 is within an octave of G5, so it should be valid
+    melodyWithHighNote.validNextNotes should contain(Note.C6)
+  }

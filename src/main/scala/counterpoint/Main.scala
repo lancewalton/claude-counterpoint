@@ -19,3 +19,10 @@ package counterpoint
   
   println("\nGetting the list of notes from a melody:")
   println(s"Melody notes: ${simpleMelody.toList}")
+  
+  println("\nFinding valid next notes for a melody:")
+  val melodyWithC4 = Melody.empty.add(Note.C4)
+  println(s"Valid notes after C4: ${melodyWithC4.validNextNotes.mkString(", ")}")
+  
+  val melodyWithG5 = Melody.empty.add(Note.G5)
+  println(s"Valid notes after G5: ${melodyWithG5.validNextNotes.mkString(", ")}")

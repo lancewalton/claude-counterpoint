@@ -17,3 +17,4 @@
 - Create an Interval class that calculates the interval between a pair of notes.
 - The interval class should know whether the interval is simple or compound
 Let's try a simpler approach to intervals
+Create a method in Melody to give is a set of valid notes that can be added next. There are rules for this which we'll add incrementally. The first rule is that any note added must be within an octave of the previous note.

@@ -5,6 +5,13 @@ case class Melody private (private val notes: List[Note]):
   
   def toList: List[Note] = notes.reverse
   
+  def validNextNotes: List[Note] =
+    if notes.isEmpty then
+      Note.allNotes
+    else
+      val lastNote = notes.head
+      Note.allNotes.filter(note => lastNote.isWithinOctave(note))
+  
   override def toString: String = toList.mkString(" ")
 
 object Melody:

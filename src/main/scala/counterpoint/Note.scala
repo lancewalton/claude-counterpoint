@@ -5,6 +5,22 @@ enum NoteName:
 
 case class Note(name: NoteName, octave: Int):
   override def toString: String = s"$name$octave"
+  
+  def midiNumber: Int = 
+    val noteValues = Map(
+      NoteName.C -> 0,
+      NoteName.D -> 2,
+      NoteName.E -> 4,
+      NoteName.F -> 5,
+      NoteName.G -> 7,
+      NoteName.A -> 9,
+      NoteName.B -> 11
+    )
+    (octave + 1) * 12 + noteValues(name)
+
+  def isWithinOctave(other: Note): Boolean =
+    val diff = math.abs(this.midiNumber - other.midiNumber)
+    diff <= 12
 
 object Note:
   import NoteName.*
@@ -40,3 +56,5 @@ object Note:
     C4, D4, E4, F4, G4, A4, B4,
     C5, D5, E5, F5, G5
   )
+  
+  val allNotes: List[Note] = cMajorScale :+ C6
