@@ -5,16 +5,6 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
   
   def toList: List[Note] = notes.reverse
   
-  private def getLastThreeNotes: (Option[Note], Option[Note], Option[Note]) =
-    val allNotes = toList
-    val size = allNotes.size
-    
-    val lastNote = if size >= 1 then Some(allNotes(size - 1)) else None
-    val secondLastNote = if size >= 2 then Some(allNotes(size - 2)) else None
-    val thirdLastNote = if size >= 3 then Some(allNotes(size - 3)) else None
-    
-    (thirdLastNote, secondLastNote, lastNote)
-  
   private def meetsWithinOctaveRule(candidateNote: Note): Boolean =
     val lastNote = notes.head
     rules.isWithinOctaveRule(lastNote, candidateNote)
@@ -28,16 +18,16 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
     rules.notATritoneRule(lastNote, candidateNote)
     
   private def meetsConsecutiveSkipsRule(candidateNote: Note): Boolean =
-    val lastNote = notes.head
-    val (thirdLastOpt, secondLastOpt, _) = getLastThreeNotes
-    
-    secondLastOpt match
-      case None => true
-      case Some(secondLastNote) =>
+    toList match
+      case Nil => true  // Empty melody
+      case _ :: Nil => true  // Only one note
+      case _ :: _ :: Nil => true  // Only two notes, not enough for consecutive skips
+      case thirdLast :: secondLast :: last :: _ =>
+        // Three or more notes, check the rule
         rules.afterTwoSkipsChangeDirectionRule(
-          thirdLastOpt,
-          secondLastNote,
-          lastNote,
+          Some(thirdLast),
+          secondLast,
+          last,
           candidateNote
         )
   
