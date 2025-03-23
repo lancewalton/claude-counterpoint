@@ -32,6 +32,8 @@ object Note:
   val F5 = Note(F, 5)
   val G5 = Note(G, 5)
   
+  val C6 = Note(C, 6)
+  
   val cMajorScale: List[Note] = List(
     G2, A2, B2, 
     C3, D3, E3, F3, G3, A3, B3,
