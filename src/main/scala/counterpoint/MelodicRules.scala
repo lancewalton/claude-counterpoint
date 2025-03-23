@@ -25,8 +25,8 @@ case class MelodicRules():
       (interval - 1) % 7 + 1
     
   def isSkip(note1: Note, note2: Note): Boolean =
-    val simpleInterval = getSimpleIntervalSize(note1, note2)
-    simpleInterval == 3 || simpleInterval == 4  // Thirds and fourths are skips
+    val interval = getIntervalSize(note1, note2)
+    interval == 3 || interval == 4  // Only actual thirds and fourths are skips, not compound versions
     
   def isLeap(note1: Note, note2: Note): Boolean =
     val simpleInterval = getSimpleIntervalSize(note1, note2)

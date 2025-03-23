@@ -46,6 +46,10 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     // Fifths and larger are not skips (they're leaps)
     rules.isSkip(Note.C4, Note.G4) should be(false)  // perfect fifth
     rules.isSkip(Note.C4, Note.A4) should be(false)  // major sixth
+    
+    // Compound intervals should not be considered skips
+    rules.isSkip(Note.C4, Note.E5) should be(false)  // tenth (compound third)
+    rules.isSkip(Note.C4, Note.F5) should be(false)  // eleventh (compound fourth)
   }
   
   it should "identify leaps correctly" in {
