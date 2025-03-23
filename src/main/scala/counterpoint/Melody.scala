@@ -15,28 +15,41 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
     
     (thirdLastNote, secondLastNote, lastNote)
   
+  private def meetsWithinOctaveRule(candidateNote: Note): Boolean =
+    val lastNote = notes.head
+    rules.isWithinOctaveRule(lastNote, candidateNote)
+    
+  private def meetsNoSeventhRule(candidateNote: Note): Boolean =
+    val lastNote = notes.head
+    rules.notASeventhRule(lastNote, candidateNote)
+    
+  private def meetsNoTritoneRule(candidateNote: Note): Boolean =
+    val lastNote = notes.head
+    rules.notATritoneRule(lastNote, candidateNote)
+    
+  private def meetsConsecutiveSkipsRule(candidateNote: Note): Boolean =
+    val lastNote = notes.head
+    val (thirdLastOpt, secondLastOpt, _) = getLastThreeNotes
+    
+    secondLastOpt match
+      case None => true
+      case Some(secondLastNote) =>
+        rules.afterTwoSkipsChangeDirectionRule(
+          thirdLastOpt,
+          secondLastNote,
+          lastNote,
+          candidateNote
+        )
+  
   def validNextNotes: List[Note] =
     if notes.isEmpty then
       Note.allNotes
     else
-      val lastNote = notes.head
-      val (thirdLastOpt, secondLastOpt, _) = getLastThreeNotes
-      
       Note.allNotes
-        .filter(note => rules.isWithinOctaveRule(lastNote, note))
-        .filter(note => rules.notASeventhRule(lastNote, note))
-        .filter(note => rules.notATritoneRule(lastNote, note))
-        .filter(note => 
-          secondLastOpt match
-            case None => true
-            case Some(secondLastNote) => 
-              rules.afterTwoSkipsChangeDirectionRule(
-                thirdLastOpt, 
-                secondLastNote, 
-                lastNote, 
-                note
-              )
-        )
+        .filter(meetsWithinOctaveRule)
+        .filter(meetsNoSeventhRule)
+        .filter(meetsNoTritoneRule)
+        .filter(meetsConsecutiveSkipsRule)
   
   override def toString: String = toList.mkString(" ")
 
