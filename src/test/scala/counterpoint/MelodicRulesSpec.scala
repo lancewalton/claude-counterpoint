@@ -8,74 +8,74 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     val rules = MelodicRules()
     
     // Ascending
-    rules.getIntervalSize(Note.C4, Note.G4) should be(5)  // fifth
+    IntervalOps.getIntervalSize(Note.C4, Note.G4) should be(5)  // fifth
     
     // Descending
-    rules.getIntervalSize(Note.G4, Note.C4) should be(5)  // still a fifth
+    IntervalOps.getIntervalSize(Note.G4, Note.C4) should be(5)  // still a fifth
     
     // Same note
-    rules.getIntervalSize(Note.C4, Note.C4) should be(1)  // unison
+    IntervalOps.getIntervalSize(Note.C4, Note.C4) should be(1)  // unison
   }
   
   it should "determine melodic direction correctly" in {
     val rules = MelodicRules()
     
     // Ascending
-    rules.getDirection(Note.C4, Note.E4) should be(1)
+    IntervalOps.getDirection(Note.C4, Note.E4) should be(1)
     
     // Descending
-    rules.getDirection(Note.G4, Note.D4) should be(-1)
+    IntervalOps.getDirection(Note.G4, Note.D4) should be(-1)
     
     // Same note
-    rules.getDirection(Note.C4, Note.C4) should be(0)
+    IntervalOps.getDirection(Note.C4, Note.C4) should be(0)
   }
   
   it should "identify skips correctly" in {
     val rules = MelodicRules()
     
     // Thirds are skips
-    rules.isSkip(Note.C4, Note.E4) should be(true)  // major third
-    rules.isSkip(Note.A4, Note.C5) should be(true)  // minor third
+    IntervalOps.isSkip(Note.C4, Note.E4) should be(true)  // major third
+    IntervalOps.isSkip(Note.A4, Note.C5) should be(true)  // minor third
     
     // Fourths are skips
-    rules.isSkip(Note.C4, Note.F4) should be(true)  // perfect fourth
+    IntervalOps.isSkip(Note.C4, Note.F4) should be(true)  // perfect fourth
     
     // Seconds are not skips
-    rules.isSkip(Note.C4, Note.D4) should be(false)  // major second
+    IntervalOps.isSkip(Note.C4, Note.D4) should be(false)  // major second
     
     // Fifths and larger are not skips (they're leaps)
-    rules.isSkip(Note.C4, Note.G4) should be(false)  // perfect fifth
-    rules.isSkip(Note.C4, Note.A4) should be(false)  // major sixth
+    IntervalOps.isSkip(Note.C4, Note.G4) should be(false)  // perfect fifth
+    IntervalOps.isSkip(Note.C4, Note.A4) should be(false)  // major sixth
     
     // Compound intervals should not be considered skips
-    rules.isSkip(Note.C4, Note.E5) should be(false)  // tenth (compound third)
-    rules.isSkip(Note.C4, Note.F5) should be(false)  // eleventh (compound fourth)
+    IntervalOps.isSkip(Note.C4, Note.E5) should be(false)  // tenth (compound third)
+    IntervalOps.isSkip(Note.C4, Note.F5) should be(false)  // eleventh (compound fourth)
   }
   
   it should "identify leaps correctly" in {
     val rules = MelodicRules()
     
     // Fifths are leaps
-    rules.isLeap(Note.C4, Note.G4) should be(true)  // perfect fifth
+    IntervalOps.isLeap(Note.C4, Note.G4) should be(true)  // perfect fifth
     
     // Sixths are leaps
-    rules.isLeap(Note.C4, Note.A4) should be(true)  // major sixth
+    IntervalOps.isLeap(Note.C4, Note.A4) should be(true)  // major sixth
     
     // Sevenths are leaps
-    rules.isLeap(Note.C4, Note.B4) should be(true)  // major seventh
+    IntervalOps.isLeap(Note.C4, Note.B4) should be(true)  // major seventh
     
     // Octaves are leaps
-    rules.isLeap(Note.C4, Note.C5) should be(true)  // octave is now considered a leap
+    IntervalOps.isLeap(Note.C4, Note.C5) should be(true)  // octave is now considered a leap
     
     // Thirds are not leaps
-    rules.isLeap(Note.C4, Note.E4) should be(false)  // major third
-    rules.isLeap(Note.A4, Note.C5) should be(false)  // minor third
+    IntervalOps.isLeap(Note.C4, Note.E4) should be(false)  // major third
+    IntervalOps.isLeap(Note.A4, Note.C5) should be(false)  // minor third
     
     // Fourths are not leaps
-    rules.isLeap(Note.C4, Note.F4) should be(false)  // perfect fourth
+    IntervalOps.isLeap(Note.C4, Note.F4) should be(false)  // perfect fourth
     
     // Seconds are not leaps
-    rules.isLeap(Note.C4, Note.D4) should be(false)  // major second
+    IntervalOps.isLeap(Note.C4, Note.D4) should be(false)  // major second
   }
   
   it should "apply the within octave rule" in {
@@ -106,15 +106,15 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     val rules = MelodicRules()
     
     // F to B is a tritone
-    rules.getSemitones(Note.F4, Note.B4) should be(6)
+    IntervalOps.getSemitones(Note.F4, Note.B4) should be(6)
     rules.notATritoneRule(Note.F4, Note.B4) should be(false)
     
     // B to F is also a tritone
-    rules.getSemitones(Note.B3, Note.F4) should be(6)
+    IntervalOps.getSemitones(Note.B3, Note.F4) should be(6)
     rules.notATritoneRule(Note.B3, Note.F4) should be(false)
     
     // C to F is a fourth, not a tritone
-    rules.getSemitones(Note.C4, Note.F4) should be(5)
+    IntervalOps.getSemitones(Note.C4, Note.F4) should be(5)
     rules.notATritoneRule(Note.C4, Note.F4) should be(true)
   }
   
@@ -393,4 +393,3 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     // A different note should be allowed
     rules.notConsecutiveRepeatedNotesRule(note, Note.F4) should be(true)
   }
-  

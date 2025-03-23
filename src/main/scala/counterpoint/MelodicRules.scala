@@ -1,36 +1,7 @@
 package counterpoint
 
 case class MelodicRules():
-  def getIntervalSize(note1: Note, note2: Note): Int =
-    if (note1.midiNumber <= note2.midiNumber)
-      note1.intervalSize(note2)
-    else
-      note2.intervalSize(note1)
-      
-  def getSemitones(note1: Note, note2: Note): Int =
-    math.abs(note1.midiNumber - note2.midiNumber) % 12
-    
-  def getDirection(from: Note, to: Note): Int =
-    if (to.midiNumber > from.midiNumber) 1
-    else if (to.midiNumber < from.midiNumber) -1
-    else 0
-    
-  // Gets the simple interval size (reduced to within an octave)
-  def getSimpleIntervalSize(note1: Note, note2: Note): Int =
-    val interval = getIntervalSize(note1, note2)
-    if interval == 8 || interval % 7 == 1 then
-      if interval == 1 then 1 else 8  // Handle unison vs octave
-    else
-      // Compound intervals reduce to their simple form
-      (interval - 1) % 7 + 1
-    
-  def isSkip(note1: Note, note2: Note): Boolean =
-    val interval = getIntervalSize(note1, note2)
-    interval == 3 || interval == 4  // Only actual thirds and fourths are skips, not compound versions
-    
-  def isLeap(note1: Note, note2: Note): Boolean =
-    val simpleInterval = getSimpleIntervalSize(note1, note2)
-    simpleInterval >= 5  // Any interval of a fifth or larger is a leap (including octave)
+  import IntervalOps._
   
   def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
     lastNote.isWithinOctave(candidate)
@@ -94,15 +65,6 @@ case class MelodicRules():
     else
       // Not a leap, so the rule doesn't apply
       true
-      
-  private def isNoteInsideSpan(middleNote: Note, fromNote: Note, toNote: Note): Boolean =
-    // Check if middleNote's MIDI number is between fromNote and toNote
-    if fromNote.midiNumber <= toNote.midiNumber then
-      // Ascending interval
-      fromNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < toNote.midiNumber
-    else
-      // Descending interval
-      toNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < fromNote.midiNumber
     
   def afterTwoSkipsChangeDirectionRule(
     thirdLastNote: Note, 
