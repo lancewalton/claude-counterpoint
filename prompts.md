@@ -30,3 +30,4 @@ A skip is a melodic interval of a third or a fourth. A new melodic rule is that 
 For the rule we just added, instead of passing 	his\ to MelodicRules, call a private method of Melody to determine if there are at least two notes and then pass the last two notes and the new proposed note to MelodicRules
 Always keep the parameters to higher order functions like filter, map, flatMap etc. simple. Do this by delegating. Add this to claude.md.
 Instead of the getLastThreeNotes method and all of those options, use a pattern match on the notes list to handle the different cases.
+Collapse the three cases where there aren't enough notes to trigger the rule down to a default case that returns true
