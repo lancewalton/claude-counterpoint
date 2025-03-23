@@ -90,27 +90,53 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
   it should "apply the two skips rule correctly" in {
     val rules = MelodicRules()
     
-    // Create a melody with two consecutive ascending skips
-    val melody = Melody.empty
-      .add(Note.C4)  // Starting note
-      .add(Note.E4)  // First skip (third up)
-      .add(Note.G4)  // Second skip (third up)
+    // Test ascending pattern
+    val thirdLastAscending = Note.C4
+    val secondLastAscending = Note.E4  // Third up from C4
+    val lastAscending = Note.G4       // Third up from E4
     
     // After two skips up, going up further should be disallowed
-    rules.afterTwoSkipsChangeDirectionRule(melody, Note.C5) should be(false)
+    rules.afterTwoSkipsChangeDirectionRule(
+      Some(thirdLastAscending), 
+      secondLastAscending, 
+      lastAscending, 
+      Note.C5  // Going up
+    ) should be(false)
     
     // After two skips up, going down should be allowed
-    rules.afterTwoSkipsChangeDirectionRule(melody, Note.F4) should be(true)
+    rules.afterTwoSkipsChangeDirectionRule(
+      Some(thirdLastAscending), 
+      secondLastAscending, 
+      lastAscending, 
+      Note.F4  // Going down
+    ) should be(true)
     
-    // Create a melody with two consecutive descending skips
-    val descendingMelody = Melody.empty
-      .add(Note.G4)  // Starting note
-      .add(Note.E4)  // First skip (third down)
-      .add(Note.C4)  // Second skip (third down)
+    // Test descending pattern
+    val thirdLastDescending = Note.G4
+    val secondLastDescending = Note.E4  // Third down from G4
+    val lastDescending = Note.C4       // Third down from E4
     
     // After two skips down, going down further should be disallowed
-    rules.afterTwoSkipsChangeDirectionRule(descendingMelody, Note.A3) should be(false)
+    rules.afterTwoSkipsChangeDirectionRule(
+      Some(thirdLastDescending), 
+      secondLastDescending, 
+      lastDescending, 
+      Note.A3  // Going down
+    ) should be(false)
     
     // After two skips down, going up should be allowed
-    rules.afterTwoSkipsChangeDirectionRule(descendingMelody, Note.D4) should be(true)
+    rules.afterTwoSkipsChangeDirectionRule(
+      Some(thirdLastDescending), 
+      secondLastDescending, 
+      lastDescending, 
+      Note.D4  // Going up
+    ) should be(true)
+    
+    // With fewer than 3 notes, the rule shouldn't apply
+    rules.afterTwoSkipsChangeDirectionRule(
+      None,
+      Note.E4,
+      Note.G4,
+      Note.C5
+    ) should be(true)
   }

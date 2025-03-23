@@ -28,23 +28,21 @@ case class MelodicRules():
   def notATritoneRule(lastNote: Note, candidate: Note): Boolean =
     getSemitones(lastNote, candidate) != 6
     
-  def afterTwoSkipsChangeDirectionRule(melody: Melody, candidate: Note): Boolean =
-    if melody.toList.size < 2 then
-      true
-    else
-      val notesList = melody.toList
-      val lastNote = notesList.last
-      val secondLastNote = notesList(notesList.size - 2)
-      
-      val lastIsSkip = isSkip(secondLastNote, lastNote)
-      val secondLastIsSkip = 
-        if notesList.size >= 3 then
-          val thirdLastNote = notesList(notesList.size - 3)
-          isSkip(thirdLastNote, secondLastNote)
-        else
-          false
-          
-      val lastDirection = getDirection(secondLastNote, lastNote)
-      val candidateDirection = getDirection(lastNote, candidate)
-      
-      !(lastIsSkip && secondLastIsSkip && lastDirection == candidateDirection)
+  def afterTwoSkipsChangeDirectionRule(
+    thirdLastNote: Option[Note], 
+    secondLastNote: Note, 
+    lastNote: Note, 
+    candidate: Note
+  ): Boolean =
+    thirdLastNote match
+      case None => 
+        // With fewer than 3 notes, the rule doesn't apply
+        true
+      case Some(thirdLast) =>
+        val lastIsSkip = isSkip(secondLastNote, lastNote)
+        val secondLastIsSkip = isSkip(thirdLast, secondLastNote)
+        
+        val lastDirection = getDirection(secondLastNote, lastNote)
+        val candidateDirection = getDirection(lastNote, candidate)
+        
+        !(lastIsSkip && secondLastIsSkip && lastDirection == candidateDirection)
