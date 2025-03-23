@@ -36,3 +36,4 @@
 - A skip is an interval of a fifth or larger. Skips must be preceded by a note inside the span of the skip.
 - The last rule we'll add is that if the last two notes of the melody are a leap, then the candidate note must be within the span of the leap
 - In MelodicRules.isLeap, octaves should be treated as leaps.
+- MelodicRules.isSkip and MelodicRules.isLeap should be using the whole interval, not the simple interval.

@@ -25,21 +25,19 @@ case class MelodicRules():
       (interval - 1) % 7 + 1
     
   def isSkip(note1: Note, note2: Note): Boolean =
-    val interval = getIntervalSize(note1, note2)
-    interval == 3 || interval == 4 ||
-    interval == 10 || interval == 11 ||  // Compound thirds (10th, 11th)
-    interval == 17 || interval == 18     // Double compound thirds (17th, 18th)
+    val simpleInterval = getSimpleIntervalSize(note1, note2)
+    simpleInterval == 3 || simpleInterval == 4  // Thirds and fourths are skips
     
   def isLeap(note1: Note, note2: Note): Boolean =
-    val interval = getIntervalSize(note1, note2)
-    interval >= 5  // Any interval of a fifth or larger is a leap
+    val simpleInterval = getSimpleIntervalSize(note1, note2)
+    simpleInterval >= 5  // Any interval of a fifth or larger is a leap (including octave)
   
   def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
     lastNote.isWithinOctave(candidate)
     
   def notASeventhRule(lastNote: Note, candidate: Note): Boolean =
-    val interval = getIntervalSize(note1 = lastNote, note2 = candidate)
-    interval != 7 && interval != 14 && interval != 21  // Reject 7th, 14th, 21st
+    val simpleInterval = getSimpleIntervalSize(lastNote, candidate)
+    simpleInterval != 7  // Reject all kinds of sevenths (simple and compound)
     
   def notATritoneRule(lastNote: Note, candidate: Note): Boolean =
     getSemitones(lastNote, candidate) != 6
@@ -55,10 +53,9 @@ case class MelodicRules():
     
     // If both movements are in the same direction
     if lastMovementDirection == candidateMovementDirection && lastMovementDirection != 0 then
-      // Check that the interval from secondLastNote to candidate is not a seventh (or compound seventh)
-      val interval = getIntervalSize(secondLastNote, candidate)
-      // Reject 7th, 14th, 21st (any interval where interval % 7 == 0 and not a unison/octave)
-      !(interval % 7 == 0 && interval > 1)
+      // Check that the interval from secondLastNote to candidate is not a seventh
+      val simpleInterval = getSimpleIntervalSize(secondLastNote, candidate)
+      simpleInterval != 7
     else
       // Rule doesn't apply if directions are different
       true
