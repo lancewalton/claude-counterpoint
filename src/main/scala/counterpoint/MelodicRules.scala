@@ -29,33 +29,29 @@ case class MelodicRules():
     getSemitones(lastNote, candidate) != 6
     
   def consecutiveSkipsNotSpanningSeventhRule(
-    thirdLastNote: Note,
     secondLastNote: Note,
     lastNote: Note,
     candidate: Note
   ): Boolean =
-    val secondLastIsSkip = isSkip(thirdLastNote, secondLastNote)
+    // Check if both intervals are skips
     val lastIsSkip = isSkip(secondLastNote, lastNote)
     val candidateIsSkip = isSkip(lastNote, candidate)
     
-    val secondLastDirection = getDirection(thirdLastNote, secondLastNote)
+    // Check direction of both intervals
     val lastDirection = getDirection(secondLastNote, lastNote)
     val candidateDirection = getDirection(lastNote, candidate)
     
-    // Check if all three intervals are in the same direction
-    val allSameDirection = 
-      secondLastDirection == lastDirection && 
-      lastDirection == candidateDirection && 
-      secondLastDirection != 0
+    // Check if both intervals are in the same direction
+    val sameDirection = lastDirection == candidateDirection && lastDirection != 0
     
-    // Only enforce rule if we have two existing skips and a potential third skip
-    if secondLastIsSkip && lastIsSkip && candidateIsSkip && allSameDirection then
-      // Calculate the total span from the third-last note to the candidate
+    // Only enforce rule if we have two consecutive skips in the same direction
+    if lastIsSkip && candidateIsSkip && sameDirection then
+      // Calculate the total span from second-last to candidate
       val totalSpan = 
-        if (thirdLastNote.midiNumber <= candidate.midiNumber)
-          thirdLastNote.intervalSize(candidate)
+        if (secondLastNote.midiNumber <= candidate.midiNumber)
+          secondLastNote.intervalSize(candidate)
         else
-          candidate.intervalSize(thirdLastNote)
+          candidate.intervalSize(secondLastNote)
       
       // Disallow if the total span is a seventh or greater
       totalSpan < 7

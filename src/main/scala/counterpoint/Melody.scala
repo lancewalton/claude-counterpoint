@@ -31,10 +31,9 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
       
   private def meetsConsecutiveSkipsSpanRule(candidateNote: Note): Boolean =
     toList match
-      case thirdLast :: secondLast :: last :: _ =>
-        // Three or more notes, check the rule
+      case secondLast :: last :: _ =>
+        // Two or more notes, check the rule
         rules.consecutiveSkipsNotSpanningSeventhRule(
-          thirdLast,
           secondLast,
           last,
           candidateNote
