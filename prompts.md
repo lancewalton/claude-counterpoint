@@ -24,3 +24,4 @@ Instead of putting all of the rules into one invocation of filter, make a chain 
 Move the rule predicates to a class called MelodicRules
 Move MelodicRules and MelodicRulesSpec into their own source files.
 The printing in Main is not useful. Stop doing it, remove what's there and make a note in claude.md for future reference
+The rules in MelodicRules need to take into account that intervals are always reckoned upwards from the lowest note for the pair
