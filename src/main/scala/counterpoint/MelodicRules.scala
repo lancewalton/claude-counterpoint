@@ -42,6 +42,9 @@ case class MelodicRules():
   def notATritoneRule(lastNote: Note, candidate: Note): Boolean =
     getSemitones(lastNote, candidate) != 6
     
+  def notConsecutiveRepeatedNotesRule(lastNote: Note, candidate: Note): Boolean =
+    lastNote != candidate  // The candidate note cannot be the same as the last note
+    
   def noSeventhInSameDirectionRule(
     secondLastNote: Note,
     lastNote: Note,

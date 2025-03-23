@@ -38,3 +38,4 @@
 - In MelodicRules.isLeap, octaves should be treated as leaps.
 - MelodicRules.isSkip and MelodicRules.isLeap should be using the whole interval, not the simple interval.
 - Use getSimpleIntervalSize in the other rules.
+- isSkip should only apply to thirds and fourths, not their compounds.

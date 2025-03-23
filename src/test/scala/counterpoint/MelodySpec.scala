@@ -104,8 +104,8 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     // We should be able to move by a third (not a skip)
     melodyForSkipTest.validNextNotes should contain(Note.D4)  // Third down from F4
     
-    // And we can always repeat a note
-    melodyForSkipTest.validNextNotes should contain(Note.F4)  // Same note
+    // We shouldn't be able to repeat the same note
+    melodyForSkipTest.validNextNotes should not contain(Note.F4)  // Same note
     
     // Test two consecutive skips rule, which is separate from the leap precedence rule
     
@@ -238,4 +238,12 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     // When there isn't a leap, the rule doesn't apply, so notes outside the span are allowed
     melodyWithoutLeap.validNextNotes should contain(Note.G4)  // Outside the span from C4 to E4
     melodyWithoutLeap.validNextNotes should contain(Note.C4)  // Outside the span from C4 to E4
+  }
+  
+  it should "not allow consecutive repeated notes" in {
+    val melody = Melody.empty
+      .add(Note.E4)
+    
+    melody.validNextNotes should not contain(Note.E4)  // Same note not allowed
+    melody.validNextNotes should contain(Note.F4)      // Different note is allowed
   }

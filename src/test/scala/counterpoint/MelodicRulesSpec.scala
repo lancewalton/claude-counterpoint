@@ -382,3 +382,15 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     ) should be(true)  // Allowed because there's no leap
   }
   
+  it should "enforce the no consecutive repeated notes rule" in {
+    val rules = MelodicRules()
+    
+    val note = Note.E4
+    
+    // The same note should be disallowed
+    rules.notConsecutiveRepeatedNotesRule(note, note) should be(false)
+    
+    // A different note should be allowed
+    rules.notConsecutiveRepeatedNotesRule(note, Note.F4) should be(true)
+  }
+  

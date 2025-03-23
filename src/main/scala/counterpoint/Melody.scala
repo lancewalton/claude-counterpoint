@@ -17,6 +17,10 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
     val lastNote = notes.head
     rules.notATritoneRule(lastNote, candidateNote)
     
+  private def meetsNotConsecutiveRepeatedNotesRule(candidateNote: Note): Boolean =
+    val lastNote = notes.head
+    rules.notConsecutiveRepeatedNotesRule(lastNote, candidateNote)
+    
   private def meetsConsecutiveSkipsRule(candidateNote: Note): Boolean =
     toList match
       case thirdLast :: secondLast :: last :: _ =>
@@ -77,6 +81,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
         .filter(meetsWithinOctaveRule)
         .filter(meetsNoSeventhRule)
         .filter(meetsNoTritoneRule)
+        .filter(meetsNotConsecutiveRepeatedNotesRule)  // Add the new rule
         .filter(meetsConsecutiveSkipsRule)
         .filter(meetsNoSeventhInSameDirectionRule)
         .filter(meetsLeapPrecedenceRule)
