@@ -12,3 +12,4 @@
 - Make the notes field private and provide a method called "toList" that returns the reversed list of notes.
 - Add a line to claude.md that indicates that no comments should be added to the code. Also remove all existing comments from the code.
 - Add a method called "getValidNextNotes" to Melody that returns a set of notes according to the following rules:
+- Please remove the getValidNextNotes method
