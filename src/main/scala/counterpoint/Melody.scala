@@ -14,6 +14,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
         .filter(note => rules.isWithinOctaveRule(lastNote, note))
         .filter(note => rules.notASeventhRule(lastNote, note))
         .filter(note => rules.notATritoneRule(lastNote, note))
+        .filter(note => rules.afterTwoSkipsChangeDirectionRule(this, note))
   
   override def toString: String = toList.mkString(" ")
 

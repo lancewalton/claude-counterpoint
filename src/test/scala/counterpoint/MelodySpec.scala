@@ -80,3 +80,33 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     val melodyWithB3 = Melody.empty.add(Note.B3)
     melodyWithB3.validNextNotes should not contain(Note.F4)  // B to F is a tritone
   }
+  
+  it should "enforce the consecutive skips rule" in {
+    // Create a melody with two consecutive ascending skips
+    val melodyWithTwoAscendingSkips = Melody.empty
+      .add(Note.C4)
+      .add(Note.E4)  // First skip (third up)
+      .add(Note.G4)  // Second skip (third up)
+    
+    // Valid next notes should contain notes that go down
+    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.F4)  // Step down
+    melodyWithTwoAscendingSkips.validNextNotes should contain(Note.E4)  // Skip down
+    
+    // Valid next notes should not contain notes that go up
+    melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.A4)  // Step up
+    melodyWithTwoAscendingSkips.validNextNotes should not contain(Note.C5)  // Skip up
+    
+    // Create a melody with two consecutive descending skips
+    val melodyWithTwoDescendingSkips = Melody.empty
+      .add(Note.G4)
+      .add(Note.E4)  // First skip (third down)
+      .add(Note.C4)  // Second skip (third down)
+    
+    // Valid next notes should contain notes that go up
+    melodyWithTwoDescendingSkips.validNextNotes should contain(Note.D4)  // Step up
+    melodyWithTwoDescendingSkips.validNextNotes should contain(Note.E4)  // Skip up
+    
+    // Valid next notes should not contain notes that go down
+    melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.B3)  // Step down
+    melodyWithTwoDescendingSkips.validNextNotes should not contain(Note.G3)  // Skip down
+  }

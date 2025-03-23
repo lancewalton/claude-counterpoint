@@ -17,6 +17,36 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     rules.getIntervalSize(Note.C4, Note.C4) should be(1)  // unison
   }
   
+  it should "determine melodic direction correctly" in {
+    val rules = MelodicRules()
+    
+    // Ascending
+    rules.getDirection(Note.C4, Note.E4) should be(1)
+    
+    // Descending
+    rules.getDirection(Note.G4, Note.D4) should be(-1)
+    
+    // Same note
+    rules.getDirection(Note.C4, Note.C4) should be(0)
+  }
+  
+  it should "identify skips correctly" in {
+    val rules = MelodicRules()
+    
+    // Thirds are skips
+    rules.isSkip(Note.C4, Note.E4) should be(true)  // major third
+    rules.isSkip(Note.A4, Note.C5) should be(true)  // minor third
+    
+    // Fourths are skips
+    rules.isSkip(Note.C4, Note.F4) should be(true)  // perfect fourth
+    
+    // Seconds are not skips
+    rules.isSkip(Note.C4, Note.D4) should be(false)  // major second
+    
+    // Fifths are not skips
+    rules.isSkip(Note.C4, Note.G4) should be(false)  // perfect fifth
+  }
+  
   it should "apply the within octave rule" in {
     val rules = MelodicRules()
     val note = Note.C4
@@ -55,4 +85,32 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     // C to F is a fourth, not a tritone
     rules.getSemitones(Note.C4, Note.F4) should be(5)
     rules.notATritoneRule(Note.C4, Note.F4) should be(true)
+  }
+  
+  it should "apply the two skips rule correctly" in {
+    val rules = MelodicRules()
+    
+    // Create a melody with two consecutive ascending skips
+    val melody = Melody.empty
+      .add(Note.C4)  // Starting note
+      .add(Note.E4)  // First skip (third up)
+      .add(Note.G4)  // Second skip (third up)
+    
+    // After two skips up, going up further should be disallowed
+    rules.afterTwoSkipsChangeDirectionRule(melody, Note.C5) should be(false)
+    
+    // After two skips up, going down should be allowed
+    rules.afterTwoSkipsChangeDirectionRule(melody, Note.F4) should be(true)
+    
+    // Create a melody with two consecutive descending skips
+    val descendingMelody = Melody.empty
+      .add(Note.G4)  // Starting note
+      .add(Note.E4)  // First skip (third down)
+      .add(Note.C4)  // Second skip (third down)
+    
+    // After two skips down, going down further should be disallowed
+    rules.afterTwoSkipsChangeDirectionRule(descendingMelody, Note.A3) should be(false)
+    
+    // After two skips down, going up should be allowed
+    rules.afterTwoSkipsChangeDirectionRule(descendingMelody, Note.D4) should be(true)
   }

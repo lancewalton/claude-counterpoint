@@ -26,3 +26,4 @@ Move MelodicRules and MelodicRulesSpec into their own source files.
 The printing in Main is not useful. Stop doing it, remove what's there and make a note in claude.md for future reference
 The rules in MelodicRules need to take into account that intervals are always reckoned upwards from the lowest note for the pair
 The next melodic rule is that the tritone is disallowed
+A skip is a melodic interval of a third or a fourth. A new melodic rule is that two skips in a row in the same direction must be followed by motion in the opposite direction.
