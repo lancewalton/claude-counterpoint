@@ -53,6 +53,23 @@ case class Note(name: NoteName, octave: Int):
     else
       // For compound intervals, add 7 for each octave
       simpleInterval + (octaves * 7)
+      
+  /**
+   * Calculate the interval between this note and another note
+   */
+  def interval(other: Note): Interval = Interval(this, other)
+  
+  /**
+   * Returns a note that is one semitone lower
+   */
+  def lower: Note =
+    Note.fromMidiNumber(midiNumber - 1)
+    
+  /**
+   * Returns a note that is one semitone higher
+   */
+  def higher: Note =
+    Note.fromMidiNumber(midiNumber + 1)
 
 object Note:
   import NoteName.*
@@ -88,3 +105,63 @@ object Note:
   )
   
   val allNotes: List[Note] = cMajorScale
+  
+  /**
+   * Mapping from MIDI note numbers to white keys (C major scale notes)
+   */
+  private val midiToWhiteKey = Map(
+    0 -> (C, -1), 2 -> (D, -1), 4 -> (E, -1), 5 -> (F, -1), 7 -> (G, -1), 9 -> (A, -1), 11 -> (B, -1),
+    12 -> (C, 0), 14 -> (D, 0), 16 -> (E, 0), 17 -> (F, 0), 19 -> (G, 0), 21 -> (A, 0), 23 -> (B, 0),
+    24 -> (C, 1), 26 -> (D, 1), 28 -> (E, 1), 29 -> (F, 1), 31 -> (G, 1), 33 -> (A, 1), 35 -> (B, 1),
+    36 -> (C, 2), 38 -> (D, 2), 40 -> (E, 2), 41 -> (F, 2), 43 -> (G, 2), 45 -> (A, 2), 47 -> (B, 2),
+    48 -> (C, 3), 50 -> (D, 3), 52 -> (E, 3), 53 -> (F, 3), 55 -> (G, 3), 57 -> (A, 3), 59 -> (B, 3),
+    60 -> (C, 4), 62 -> (D, 4), 64 -> (E, 4), 65 -> (F, 4), 67 -> (G, 4), 69 -> (A, 4), 71 -> (B, 4),
+    72 -> (C, 5), 74 -> (D, 5), 76 -> (E, 5), 77 -> (F, 5), 79 -> (G, 5), 81 -> (A, 5), 83 -> (B, 5),
+    84 -> (C, 6), 86 -> (D, 6), 88 -> (E, 6), 89 -> (F, 6), 91 -> (G, 6), 93 -> (A, 6), 95 -> (B, 6),
+    96 -> (C, 7), 98 -> (D, 7), 100 -> (E, 7), 101 -> (F, 7), 103 -> (G, 7), 105 -> (A, 7), 107 -> (B, 7),
+    108 -> (C, 8), 110 -> (D, 8), 112 -> (E, 8), 113 -> (F, 8), 115 -> (G, 8), 117 -> (A, 8), 119 -> (B, 8),
+    120 -> (C, 9), 122 -> (D, 9), 124 -> (E, 9), 125 -> (F, 9), 127 -> (G, 9)
+  )
+  
+  /**
+   * Mapping from MIDI note numbers to black keys (accidentals)
+   * Used for enharmonic alternatives
+   */
+  private val midiToBlackKey = Map(
+    1 -> (C, -1, true), 3 -> (D, -1, true), 6 -> (F, -1, true), 8 -> (G, -1, true), 10 -> (A, -1, true),
+    13 -> (C, 0, true), 15 -> (D, 0, true), 18 -> (F, 0, true), 20 -> (G, 0, true), 22 -> (A, 0, true),
+    25 -> (C, 1, true), 27 -> (D, 1, true), 30 -> (F, 1, true), 32 -> (G, 1, true), 34 -> (A, 1, true),
+    37 -> (C, 2, true), 39 -> (D, 2, true), 42 -> (F, 2, true), 44 -> (G, 2, true), 46 -> (A, 2, true),
+    49 -> (C, 3, true), 51 -> (D, 3, true), 54 -> (F, 3, true), 56 -> (G, 3, true), 58 -> (A, 3, true),
+    61 -> (C, 4, true), 63 -> (D, 4, true), 66 -> (F, 4, true), 68 -> (G, 4, true), 70 -> (A, 4, true),
+    73 -> (C, 5, true), 75 -> (D, 5, true), 78 -> (F, 5, true), 80 -> (G, 5, true), 82 -> (A, 5, true),
+    85 -> (C, 6, true), 87 -> (D, 6, true), 90 -> (F, 6, true), 92 -> (G, 6, true), 94 -> (A, 6, true),
+    97 -> (C, 7, true), 99 -> (D, 7, true), 102 -> (F, 7, true), 104 -> (G, 7, true), 106 -> (A, 7, true),
+    109 -> (C, 8, true), 111 -> (D, 8, true), 114 -> (F, 8, true), 116 -> (G, 8, true), 118 -> (A, 8, true),
+    121 -> (C, 9, true), 123 -> (D, 9, true), 126 -> (F, 9, true)
+  )
+  
+  /**
+   * Create a Note from a MIDI number, preferring white keys in C major
+   */
+  def fromMidiNumber(midiNumber: Int): Note = {
+    // First check if it's a white key
+    if (midiToWhiteKey.contains(midiNumber)) {
+      val (name, octave) = midiToWhiteKey(midiNumber)
+      Note(name, octave)
+    } else if (midiToBlackKey.contains(midiNumber)) {
+      // For simplicity, we'll just pick the sharp version
+      // (in real music theory, we'd choose based on context)
+      val (name, octave, _) = midiToBlackKey(midiNumber)
+      
+      // Take the note below and sharpen it
+      // This is a simplified approach - in real music theory, the choice would depend on the scale/key
+      val noteBelowMidi = midiNumber - 1
+      val (nameBelow, octaveBelow) = midiToWhiteKey(noteBelowMidi)
+      
+      // Return the white key that's one semitone lower
+      Note(nameBelow, octaveBelow)
+    } else {
+      throw IllegalArgumentException(s"Invalid MIDI number: $midiNumber")
+    }
+  }

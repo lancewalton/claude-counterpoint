@@ -39,3 +39,5 @@
 - MelodicRules.isSkip and MelodicRules.isLeap should be using the whole interval, not the simple interval.
 - Use getSimpleIntervalSize in the other rules.
 - isSkip should only apply to thirds and fourths, not their compounds.
+- Add another melodic rule which is that the candidate note cannot be the same as the last note of the melody.
+- Create a CounterpointRules class to validate rules between multiple melodic lines, starting with the prohibition of parallel perfect fifths.
