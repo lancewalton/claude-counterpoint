@@ -1,74 +1,44 @@
 package counterpoint
 
+/**
+ * DEPRECATED: This class is kept for backward compatibility with tests.
+ * All functionality has been moved to the Interval companion object.
+ * Use methods from Interval instead.
+ */
+@deprecated("Use methods from Interval companion object instead", "2.0.0")
 object IntervalOps:
   def getDirection(from: Note, to: Note): Int =
-    if (to.midiNumber > from.midiNumber) 1
-    else if (to.midiNumber < from.midiNumber) -1
-    else 0
+    Interval.direction(from, to)
     
   def getInterval(note1: Note, note2: Note): Interval =
-    if (note1.midiNumber <= note2.midiNumber)
-      note1.interval(note2)
-    else
-      note2.interval(note1)
+    Interval.between(note1, note2)
   
   def getIntervalSize(note1: Note, note2: Note): Int =
-    if (note1.midiNumber <= note2.midiNumber)
-      note1.intervalSize(note2)
-    else
-      note2.intervalSize(note1)
+    Interval.size(note1, note2)
       
   def getSemitones(note1: Note, note2: Note): Int =
-    math.abs(note1.midiNumber - note2.midiNumber) % 12
+    Interval.semitones(note1, note2)
     
   def getSimpleIntervalSize(note1: Note, note2: Note): Int =
-    val interval = getIntervalSize(note1, note2)
-    if interval == 8 || interval % 7 == 1 then
-      if interval == 1 then 1 else 8  // Handle unison vs octave
-    else
-      // Compound intervals reduce to their simple form
-      (interval - 1) % 7 + 1
+    Interval.simpleSize(note1, note2)
       
   def getSimpleInterval(interval: Interval): Interval =
-    if interval.isCompound then
-      // Get the simple interval properties
-      val simpleNumber = (interval.number - 1) % 7 + 1
-      val simpleName = interval.name.simpleIntervalName
-      val simpleSemitones = interval.semitones % 12
-      
-      // Create a new interval with the simple properties but preserve the quality
-      Interval(simpleNumber, simpleName, interval.quality, simpleSemitones)
-    else
-      interval
+    interval.toSimpleInterval
       
   def isSkip(note1: Note, note2: Note): Boolean =
-    val interval = getIntervalSize(note1, note2)
-    interval == 3 || interval == 4  // Only actual thirds and fourths are skips, not compound versions
+    Interval.isSkip(note1, note2)
     
   def isLeap(note1: Note, note2: Note): Boolean =
-    val intervalSize = getIntervalSize(note1, note2)
-    val simpleInterval = getSimpleIntervalSize(note1, note2)
-    
-    // Both compound intervals and intervals of a fifth or larger are leaps
-    intervalSize > 8 || simpleInterval >= 5  // Any interval of a fifth or larger is a leap (including octave)
+    Interval.isLeap(note1, note2)
     
   def isMelodicStep(from: Note, to: Note): Boolean =
-    val semitones = math.abs(to.midiNumber - from.midiNumber)
-    semitones == 1 || semitones == 2  // minor or major second
+    Interval.isMelodicStep(from, to)
     
   def isPerfectFifth(interval: Interval): Boolean =
-    val simpleInterval = getSimpleInterval(interval)
-    simpleInterval.name == IntervalName.Fifth && simpleInterval.quality == IntervalQuality.Perfect
+    interval.isPerfectFifth
     
   def isPerfectOctave(interval: Interval): Boolean =
-    val simpleInterval = getSimpleInterval(interval)
-    simpleInterval.name == IntervalName.Octave && simpleInterval.quality == IntervalQuality.Perfect
+    interval.isPerfectOctave
     
   def isNoteInsideSpan(middleNote: Note, fromNote: Note, toNote: Note): Boolean =
-    // Check if middleNote's MIDI number is between fromNote and toNote
-    if fromNote.midiNumber <= toNote.midiNumber then
-      // Ascending interval
-      fromNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < toNote.midiNumber
-    else
-      // Descending interval
-      toNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < fromNote.midiNumber
+    Interval.isNoteInsideSpan(middleNote, fromNote, toNote)

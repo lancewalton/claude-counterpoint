@@ -23,42 +23,49 @@ case class Interval(number: Int, name: IntervalName, quality: IntervalQuality, s
 
   def isConsonant: Boolean =
     // For compound intervals, check the simple version
-    if isCompound then
-      // Get the simple interval name (reduces compound intervals to their simple form)
-      val simpleName = name.simpleIntervalName
-      (simpleName, quality) match
-        case (IntervalName.Unison, IntervalQuality.Perfect) => true
-        case (IntervalName.Third, IntervalQuality.Major) => true
-        case (IntervalName.Third, IntervalQuality.Minor) => true
-        case (IntervalName.Fifth, IntervalQuality.Perfect) => true
-        case (IntervalName.Sixth, IntervalQuality.Major) => true
-        case (IntervalName.Sixth, IntervalQuality.Minor) => true
-        case (IntervalName.Octave, IntervalQuality.Perfect) => true
-        case _ => false
-    else
-      // Simple intervals
-      (name, quality) match
-        case (IntervalName.Unison, IntervalQuality.Perfect) => true
-        case (IntervalName.Third, IntervalQuality.Major) => true
-        case (IntervalName.Third, IntervalQuality.Minor) => true
-        case (IntervalName.Fifth, IntervalQuality.Perfect) => true
-        case (IntervalName.Sixth, IntervalQuality.Major) => true
-        case (IntervalName.Sixth, IntervalQuality.Minor) => true
-        case (IntervalName.Octave, IntervalQuality.Perfect) => true
-        case _ => false
+    val (simpleName, simpleQuality) = getSimpleForm
+    (simpleName, simpleQuality) match
+      case (IntervalName.Unison, IntervalQuality.Perfect) => true
+      case (IntervalName.Third, IntervalQuality.Major) => true
+      case (IntervalName.Third, IntervalQuality.Minor) => true
+      case (IntervalName.Fifth, IntervalQuality.Perfect) => true
+      case (IntervalName.Sixth, IntervalQuality.Major) => true
+      case (IntervalName.Sixth, IntervalQuality.Minor) => true
+      case (IntervalName.Octave, IntervalQuality.Perfect) => true
+      case _ => false
 
   def isPerfect: Boolean =
     // For compound intervals, check if the simple form is perfect
+    val (simpleName, simpleQuality) = getSimpleForm
+    simpleQuality == IntervalQuality.Perfect && 
+    (simpleName == IntervalName.Unison || simpleName == IntervalName.Fourth || 
+     simpleName == IntervalName.Fifth || simpleName == IntervalName.Octave)
+     
+  def isPerfectFifth: Boolean =
+    val (simpleName, simpleQuality) = getSimpleForm
+    simpleName == IntervalName.Fifth && simpleQuality == IntervalQuality.Perfect
+    
+  def isPerfectOctave: Boolean =
+    val (simpleName, simpleQuality) = getSimpleForm
+    simpleName == IntervalName.Octave && simpleQuality == IntervalQuality.Perfect
+    
+  def getSimpleForm: (IntervalName, IntervalQuality) =
     if isCompound then
-      // Get the simple interval name
-      val simpleName = name.simpleIntervalName
-      quality == IntervalQuality.Perfect && 
-      (simpleName == IntervalName.Unison || simpleName == IntervalName.Fourth || 
-       simpleName == IntervalName.Fifth || simpleName == IntervalName.Octave)
+      (name.simpleIntervalName, quality)
     else
-      quality == IntervalQuality.Perfect && 
-      (name == IntervalName.Unison || name == IntervalName.Fourth || 
-       name == IntervalName.Fifth || name == IntervalName.Octave)
+      (name, quality)
+      
+  def toSimpleInterval: Interval =
+    if isCompound then
+      // Get the simple interval properties
+      val simpleNumber = (number - 1) % 7 + 1
+      val simpleName = name.simpleIntervalName
+      val simpleSemitones = semitones % 12
+      
+      // Create a new interval with the simple properties but preserve the quality
+      Interval(simpleNumber, simpleName, quality, simpleSemitones)
+    else
+      this
 
 object Interval:
   def apply(from: Note, to: Note): Interval =
@@ -83,6 +90,58 @@ object Interval:
     val (name, quality) = numberAndSemitonesToNameAndQuality(number, semitones)
     
     Interval(number, name, quality, semitones)
+  
+  def between(note1: Note, note2: Note): Interval =
+    if (note1.midiNumber <= note2.midiNumber)
+      note1.interval(note2)
+    else
+      note2.interval(note1)
+      
+  def size(note1: Note, note2: Note): Int =
+    if (note1.midiNumber <= note2.midiNumber)
+      note1.intervalSize(note2)
+    else
+      note2.intervalSize(note1)
+  
+  def semitones(note1: Note, note2: Note): Int =
+    math.abs(note1.midiNumber - note2.midiNumber) % 12
+    
+  def simpleSize(note1: Note, note2: Note): Int =
+    val interval = size(note1, note2)
+    if interval == 8 || interval % 7 == 1 then
+      if interval == 1 then 1 else 8  // Handle unison vs octave
+    else
+      // Compound intervals reduce to their simple form
+      (interval - 1) % 7 + 1
+  
+  def direction(from: Note, to: Note): Int =
+    if (to.midiNumber > from.midiNumber) 1
+    else if (to.midiNumber < from.midiNumber) -1
+    else 0
+  
+  def isSkip(note1: Note, note2: Note): Boolean =
+    val interval = size(note1, note2)
+    interval == 3 || interval == 4  // Only actual thirds and fourths are skips
+  
+  def isLeap(note1: Note, note2: Note): Boolean =
+    val intervalSize = size(note1, note2)
+    val simpleInterval = simpleSize(note1, note2)
+    
+    // Both compound intervals and intervals of a fifth or larger are leaps
+    intervalSize > 8 || simpleInterval >= 5  // Any interval of a fifth or larger is a leap
+  
+  def isMelodicStep(from: Note, to: Note): Boolean =
+    val semitones = math.abs(to.midiNumber - from.midiNumber)
+    semitones == 1 || semitones == 2  // minor or major second
+  
+  def isNoteInsideSpan(middleNote: Note, fromNote: Note, toNote: Note): Boolean =
+    // Check if middleNote's MIDI number is between fromNote and toNote
+    if fromNote.midiNumber <= toNote.midiNumber then
+      // Ascending interval
+      fromNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < toNote.midiNumber
+    else
+      // Descending interval
+      toNote.midiNumber < middleNote.midiNumber && middleNote.midiNumber < fromNote.midiNumber
     
   private def noteNameToValue(name: NoteName): Int =
     name match

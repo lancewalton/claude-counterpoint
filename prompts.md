@@ -41,3 +41,7 @@
 - isSkip should only apply to thirds and fourths, not their compounds.
 - Add another melodic rule which is that the candidate note cannot be the same as the last note of the melody.
 - Create a CounterpointRules class to validate rules between multiple melodic lines, starting with the prohibition of parallel perfect fifths.
+- There is some duplication regarding interval calculation between MelodicRules and CounterpointRules. Extract all of the interval calculation stuff into an Interval class or object.
+- Does IntervalOps handle all cases? For example, are the intervals between G2 and A4, B4, C5, D5, E5, F5 and G5 handled?
+- But now the same question for Interval. Does it handle the larger compound intervals correctly, for the purposes of the MelodicRules and CounterpointRules?
+- There is duplication of logic between Interval and IntervalOps. Wouldn't it be better for MelodicRules and CounterpointRules need to knows things about intervals to get the Interval companion object to contruct the Interval, and then ask the Interval instance the right questions?
