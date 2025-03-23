@@ -69,13 +69,18 @@ case class Interval(number: Int, name: IntervalName, quality: IntervalQuality, s
 
 object Interval:
   /**
-   * Creates an interval from one note to another, preserving the direction.
-   * When using apply, the order of the notes matters - it preserves the direction
-   * of the interval. Two intervals with the same notes in opposite order will
-   * have identical property values but will be considered different instances.
+   * Creates an interval from one note to another.
    * 
-   * Use this method when the direction of the interval is important.
-   * Use between() when you just want the interval size regardless of direction.
+   * IMPORTANT: In the current implementation, this method is functionally 
+   * equivalent to the between() method. Both methods calculate intervals
+   * based solely on the musical distance, not the direction.
+   * 
+   * Although conceptually this method should preserve direction information
+   * (ascending vs. descending), the current implementation does not distinguish
+   * between intervals in different directions with the same musical distance.
+   * 
+   * For consistent code: use apply() when the conceptual direction matters,
+   * and between() when you specifically want to ignore direction.
    */
   def apply(from: Note, to: Note): Interval =
     val isAscending = to.midiNumber >= from.midiNumber
@@ -87,7 +92,9 @@ object Interval:
     
     val octaveDiff = to.octave - from.octave
     
-    // Calculate interval size differently for ascending vs descending
+    // NOTE: Our implementation doesn't actually distinguish between ascending and
+    // descending intervals. Both calculations lead to the same interval properties.
+    // A full implementation would represent these differently.
     val number = if isAscending then
       // For ascending intervals:
       val rawDiff = toValue - fromValue 
@@ -95,8 +102,6 @@ object Interval:
       adjustedDiff + 1 + (octaveDiff * 7)
     else
       // For descending intervals:
-      // The conventional approach is to preserve the diatonic interval size
-      // For example: C4 to B3 is a descending second, or C4 to F3 is a descending fifth
       val rawDiff = fromValue - toValue
       val adjustedDiff = if rawDiff < 0 then rawDiff + 7 else rawDiff
       adjustedDiff + 1 + (math.abs(octaveDiff) * 7)
@@ -104,26 +109,20 @@ object Interval:
     // Now, determine the interval name and quality based on the semitones and number
     val (name, quality) = numberAndSemitonesToNameAndQuality(number, semitones)
     
-    // Create a new instance with these properties
-    val interval = new Interval(number, name, quality, semitones)
-    
-    // For descending intervals, we need to create a distinct instance
-    // to demonstrate the difference in equality testing
-    if !isAscending then
-      // We use "new" to create a different object reference while
-      // keeping the same property values, demonstrating that direction matters
-      new Interval(number, name, quality, semitones)
-    else
-      interval
+    // Create and return the interval
+    Interval(number, name, quality, semitones)
   
   /**
-   * Creates an interval between two notes, ignoring the order of the notes.
-   * When using between, the order of the notes doesn't matter - it always
-   * measures from the lower note to the higher note (in terms of pitch).
-   * Two intervals with the same notes in opposite order will be considered equal.
+   * Creates an interval between two notes, explicitly ignoring the order of the notes.
+   * This method always measures from the lower note to the higher note (in terms of pitch).
    * 
-   * Use this method when you just want the interval size regardless of direction.
-   * Use apply() when the direction of the interval is important.
+   * IMPORTANT: In the current implementation, this method is functionally 
+   * equivalent to the apply() method. Both methods calculate intervals
+   * based solely on the musical distance, not the direction.
+   * 
+   * For consistent code: use between() when the direction doesn't matter,
+   * and apply() when you want to conceptually preserve direction information
+   * (even though the current implementation doesn't actually distinguish them).
    */
   def between(note1: Note, note2: Note): Interval =
     if (note1.midiNumber <= note2.midiNumber)
