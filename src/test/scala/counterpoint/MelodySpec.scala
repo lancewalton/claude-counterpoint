@@ -22,10 +22,9 @@ class MelodySpec extends AnyFlatSpec with Matchers:
   }
   
   it should "be created with a list of notes" in {
-    val notes = List(Note.C4, Note.D4, Note.E4)
-    val melody = Melody(notes)
+    val melody = Melody(List(Note.C4, Note.D4, Note.E4))
     
-    melody.toList should be(notes)
+    melody.toList should be(List(Note.C4, Note.D4, Note.E4))
   }
   
   it should "have a string representation" in {
@@ -42,4 +41,10 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     melody.toList should be(List(Note.C4, Note.D4, Note.E4))
     
     melody.toString should be("C4 D4 E4")
+  }
+  
+  it should "support varargs in the constructor" in {
+    val melody = Melody(Note.C4, Note.D4, Note.E4)
+    
+    melody.toList should be(List(Note.C4, Note.D4, Note.E4))
   }

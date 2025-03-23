@@ -13,3 +13,4 @@
 - Add a line to claude.md that indicates that no comments should be added to the code. Also remove all existing comments from the code.
 - Add a method called "getValidNextNotes" to Melody that returns a set of notes according to the following rules:
 - Please remove the getValidNextNotes method
+- The Melody.toList method should reverse the list. Also, the companion object apply method should take a varargs of notes and create a list, reverse it and then pass it to the Melody constructor.
