@@ -72,3 +72,11 @@ class MelodySpec extends AnyFlatSpec with Matchers:
     melody.validNextNotes should not contain(Note.B4)  // seventh interval
     melody.validNextNotes should not contain(Note.D5)  // outside octave
   }
+  
+  it should "disallow tritones" in {
+    val melodyWithF4 = Melody.empty.add(Note.F4)
+    melodyWithF4.validNextNotes should not contain(Note.B4)  // F to B is a tritone
+    
+    val melodyWithB3 = Melody.empty.add(Note.B3)
+    melodyWithB3.validNextNotes should not contain(Note.F4)  // B to F is a tritone
+  }

@@ -13,6 +13,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
       Note.allNotes
         .filter(note => rules.isWithinOctaveRule(lastNote, note))
         .filter(note => rules.notASeventhRule(lastNote, note))
+        .filter(note => rules.notATritoneRule(lastNote, note))
   
   override def toString: String = toList.mkString(" ")
 

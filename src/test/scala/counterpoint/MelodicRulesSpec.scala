@@ -40,3 +40,19 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     rules.notASeventhRule(Note.D4, Note.C5) should be(false)
     rules.notASeventhRule(Note.F4, Note.E5) should be(false)
   }
+  
+  it should "identify tritones correctly" in {
+    val rules = MelodicRules()
+    
+    // F to B is a tritone
+    rules.getSemitones(Note.F4, Note.B4) should be(6)
+    rules.notATritoneRule(Note.F4, Note.B4) should be(false)
+    
+    // B to F is also a tritone
+    rules.getSemitones(Note.B3, Note.F4) should be(6)
+    rules.notATritoneRule(Note.B3, Note.F4) should be(false)
+    
+    // C to F is a fourth, not a tritone
+    rules.getSemitones(Note.C4, Note.F4) should be(5)
+    rules.notATritoneRule(Note.C4, Note.F4) should be(true)
+  }
