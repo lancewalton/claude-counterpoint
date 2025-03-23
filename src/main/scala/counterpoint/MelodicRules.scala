@@ -15,19 +15,29 @@ case class MelodicRules():
     else if (to.midiNumber < from.midiNumber) -1
     else 0
     
-  def isSkip(note1: Note, note2: Note): Boolean =
+  // Gets the simple interval size (reduced to within an octave)
+  def getSimpleIntervalSize(note1: Note, note2: Note): Int =
     val interval = getIntervalSize(note1, note2)
-    interval == 3 || interval == 4
+    if interval == 8 || interval % 7 == 1 then
+      if interval == 1 then 1 else 8  // Handle unison vs octave
+    else
+      // Compound intervals reduce to their simple form
+      (interval - 1) % 7 + 1
+    
+  def isSkip(note1: Note, note2: Note): Boolean =
+    val simpleInterval = getSimpleIntervalSize(note1, note2)
+    simpleInterval == 3 || simpleInterval == 4
     
   def isLeap(note1: Note, note2: Note): Boolean =
-    val interval = getIntervalSize(note1, note2)
-    interval >= 5
+    val simpleInterval = getSimpleIntervalSize(note1, note2)
+    simpleInterval >= 5 && simpleInterval < 8  // Don't count octaves as leaps
   
   def isWithinOctaveRule(lastNote: Note, candidate: Note): Boolean =
     lastNote.isWithinOctave(candidate)
     
   def notASeventhRule(lastNote: Note, candidate: Note): Boolean =
-    getIntervalSize(lastNote, candidate) != 7
+    val simpleInterval = getSimpleIntervalSize(lastNote, candidate)
+    simpleInterval != 7
     
   def notATritoneRule(lastNote: Note, candidate: Note): Boolean =
     getSemitones(lastNote, candidate) != 6
@@ -44,7 +54,8 @@ case class MelodicRules():
     // If both movements are in the same direction
     if lastMovementDirection == candidateMovementDirection && lastMovementDirection != 0 then
       // Check that the interval from secondLastNote to candidate is not a seventh
-      getIntervalSize(secondLastNote, candidate) != 7
+      val simpleInterval = getSimpleIntervalSize(secondLastNote, candidate)
+      simpleInterval != 7
     else
       // Rule doesn't apply if directions are different
       true

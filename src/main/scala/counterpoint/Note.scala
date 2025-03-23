@@ -23,27 +23,44 @@ case class Note(name: NoteName, octave: Int):
     diff <= 12
     
   def intervalSize(other: Note): Int =
-    // We need to know if we're going up or down to determine the interval
+    // For compound intervals, we need to work with the actual semitone difference
     val isAscending = this.midiNumber < other.midiNumber
-    val semitones = math.abs(this.midiNumber - other.midiNumber) % 12
+    val semitones = math.abs(this.midiNumber - other.midiNumber)
     
-    // Special cases for G to C and C to G intervals
-    if (this.name == NoteName.G && other.name == NoteName.C && isAscending) then
-      return 4  // G up to C is a fourth
+    // Calculate octave displacement
+    val octaves = semitones / 12
+    val remainingSemitones = semitones % 12
     
-    if (this.name == NoteName.C && other.name == NoteName.G && !isAscending) then
-      return 5  // C down to G is a fifth
+    // Calculate the simple interval (no octaves)
+    val simpleInterval =
+      // Special case for G to C
+      if (this.name == NoteName.G && other.name == NoteName.C && isAscending) then
+        4  // G up to C is a fourth
+      // Special case for C to G  
+      else if (this.name == NoteName.C && other.name == NoteName.G && !isAscending) then
+        5  // C down to G is a fifth
+      else
+        remainingSemitones match
+          case 0 => if semitones == 0 then 1 else 8  // unison or octave
+          case 1 | 2 => 2  // second
+          case 3 | 4 => 3  // third
+          case 5 => 4  // fourth
+          case 7 => 5  // fifth
+          case 8 | 9 => 6  // sixth
+          case 10 | 11 => 7  // seventh
+          case 6 => if isAscending then 4 else 5  // tritone - aug 4th or dim 5th
+          case _ => throw IllegalArgumentException(s"Invalid semitone difference: $remainingSemitones")
     
-    semitones match
-      case 0 => 1  // unison or octave
-      case 1 | 2 => 2  // second
-      case 3 | 4 => 3  // third
-      case 5 => 4  // fourth
-      case 7 => 5  // fifth
-      case 8 | 9 => 6  // sixth
-      case 10 | 11 => 7  // seventh
-      case 6 => if isAscending then 4 else 5  // tritone - aug 4th or dim 5th
-      case _ => throw IllegalArgumentException(s"Invalid semitone difference: $semitones")
+    // Calculate compound interval
+    if simpleInterval == 8 then
+      // For octaves: unison(1) + 7*octaves
+      (octaves * 7) + 1
+    else if simpleInterval == 1 && octaves > 0 then
+      // Compound unison is an octave
+      octaves * 7 + 1
+    else
+      // For compound intervals, add 7 for each octave
+      simpleInterval + (octaves * 7)
 
 object Note:
   import NoteName.*
