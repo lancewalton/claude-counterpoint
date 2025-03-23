@@ -97,7 +97,7 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     
     // After two skips up, going up further should be disallowed
     rules.afterTwoSkipsChangeDirectionRule(
-      Some(thirdLastAscending), 
+      thirdLastAscending, 
       secondLastAscending, 
       lastAscending, 
       Note.C5  // Going up
@@ -105,7 +105,7 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     
     // After two skips up, going down should be allowed
     rules.afterTwoSkipsChangeDirectionRule(
-      Some(thirdLastAscending), 
+      thirdLastAscending, 
       secondLastAscending, 
       lastAscending, 
       Note.F4  // Going down
@@ -118,7 +118,7 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     
     // After two skips down, going down further should be disallowed
     rules.afterTwoSkipsChangeDirectionRule(
-      Some(thirdLastDescending), 
+      thirdLastDescending, 
       secondLastDescending, 
       lastDescending, 
       Note.A3  // Going down
@@ -126,17 +126,9 @@ class MelodicRulesSpec extends AnyFlatSpec with Matchers:
     
     // After two skips down, going up should be allowed
     rules.afterTwoSkipsChangeDirectionRule(
-      Some(thirdLastDescending), 
+      thirdLastDescending, 
       secondLastDescending, 
       lastDescending, 
       Note.D4  // Going up
-    ) should be(true)
-    
-    // With fewer than 3 notes, the rule shouldn't apply
-    rules.afterTwoSkipsChangeDirectionRule(
-      None,
-      Note.E4,
-      Note.G4,
-      Note.C5
     ) should be(true)
   }

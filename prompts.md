@@ -31,3 +31,4 @@ For the rule we just added, instead of passing 	his\ to MelodicRules, call a pri
 Always keep the parameters to higher order functions like filter, map, flatMap etc. simple. Do this by delegating. Add this to claude.md.
 Instead of the getLastThreeNotes method and all of those options, use a pattern match on the notes list to handle the different cases.
 Collapse the three cases where there aren't enough notes to trigger the rule down to a default case that returns true
+The first parameter of MelodicRules.afterTwoSkipsChangeDirectionRule does not need to be an Option. Change it to just take a Note.

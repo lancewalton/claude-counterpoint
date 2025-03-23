@@ -22,7 +22,7 @@ case class Melody private (private val notes: List[Note], val rules: MelodicRule
       case thirdLast :: secondLast :: last :: _ =>
         // Three or more notes, check the rule
         rules.afterTwoSkipsChangeDirectionRule(
-          Some(thirdLast),
+          thirdLast,
           secondLast,
           last,
           candidateNote
