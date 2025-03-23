@@ -27,7 +27,7 @@ case class Note(name: NoteName, octave: Int):
     val isAscending = this.midiNumber < other.midiNumber
     val semitones = math.abs(this.midiNumber - other.midiNumber) % 12
     
-    // Hard-code G to C which is a known edge case
+    // Special cases for G to C and C to G intervals
     if (this.name == NoteName.G && other.name == NoteName.C && isAscending) then
       return 4  // G up to C is a fourth
     

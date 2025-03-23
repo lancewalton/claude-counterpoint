@@ -40,13 +40,22 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     Note(C, 4).intervalSize(Note(G, 4)) should be(5)  // fifth
     Note(C, 4).intervalSize(Note(A, 4)) should be(6)  // sixth
     Note(C, 4).intervalSize(Note(B, 4)) should be(7)  // seventh
-    Note(C, 4).intervalSize(Note(C, 5)) should be(1)  // octave
+    Note(C, 4).intervalSize(Note(C, 5)) should be(1)  // octave (same interval class as unison)
     
     // Test both ascending and descending intervals
     // G4 to C5 is a fourth (5 semitones up)
     Note(G, 4).intervalSize(Note(C, 5)) should be(4)
     // C5 to G4 is a fifth (7 semitones down)
     Note(C, 5).intervalSize(Note(G, 4)) should be(5)
+    
+    // Test compound intervals (they reduce to simple intervals)
+    Note(C, 4).intervalSize(Note(D, 5)) should be(2)  // compound second (ninth)
+    Note(C, 4).intervalSize(Note(E, 5)) should be(3)  // compound third (tenth)
+    Note(C, 4).intervalSize(Note(F, 5)) should be(4)  // compound fourth (eleventh)
+    
+    // Test multiple octaves
+    Note(C, 3).intervalSize(Note(C, 5)) should be(1)  // two octaves (reduces to unison)
+    Note(C, 3).intervalSize(Note(C, 6)) should be(1)  // three octaves (reduces to unison)
   }
   
   "Note object" should "contain all notes of C major scale from G2 to G5" in {
