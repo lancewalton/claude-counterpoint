@@ -13,13 +13,13 @@ class NoteSpec extends AnyFlatSpec with Matchers:
     c4.toString should be ("C4")
   }
   
-  "Notes object" should "contain all notes of C major scale from G2 to G5" in {
-    Notes.cMajorScale.size should be (22)
-    Notes.cMajorScale.head should be (Notes.G2)
-    Notes.cMajorScale.last should be (Notes.G5)
+  "Note object" should "contain all notes of C major scale from G2 to G5" in {
+    Note.cMajorScale.size should be (22)
+    Note.cMajorScale.head should be (Note.G2)
+    Note.cMajorScale.last should be (Note.G5)
     
     // Check some specific notes
-    Notes.cMajorScale should contain (Notes.C4)
-    Notes.cMajorScale should contain (Notes.G3)
-    Notes.cMajorScale should contain (Notes.E5)
+    Note.cMajorScale should contain (Note.C4)
+    Note.cMajorScale should contain (Note.G3)
+    Note.cMajorScale should contain (Note.E5)
   }

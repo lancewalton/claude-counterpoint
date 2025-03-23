@@ -6,7 +6,7 @@ enum NoteName:
 case class Note(name: NoteName, octave: Int):
   override def toString: String = s"$name$octave"
 
-object Notes:
+object Note:
   import NoteName.*
   
   // C Major scale notes from G2 to G5
